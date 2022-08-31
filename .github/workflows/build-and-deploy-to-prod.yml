@@ -1,4 +1,4 @@
-name: Build and deploy docker image to (dev) ECR and update ECS task def
+name: Build and deploy docker image to (prod) ECR and update ECS task def
 
 on:
   push:

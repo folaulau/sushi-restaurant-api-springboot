@@ -92,10 +92,10 @@ jobs:
     if: github.ref == 'refs/heads/development'
 
     env:
-      DEV_ECS_CLUSTER: pooch-dev
-      DEV_ECS_SERVICE: pooch-api-dev
-      CONTAINER_NAME: pooch-api
-      TASK_DEFINITION: pooch-api-dev
+      DEV_ECS_CLUSTER: pocsoft
+      DEV_ECS_SERVICE: sushi-api-dev
+      CONTAINER_NAME: sushi-api-dev
+      TASK_DEFINITION: sushi-api-dev
 
     # https://github.com/aws-actions/amazon-ecs-deploy-task-definition
     # https://aws.amazon.com/blogs/containers/create-a-ci-cd-pipeline-for-amazon-ecs-with-github-actions-and-aws-codebuild-tests/

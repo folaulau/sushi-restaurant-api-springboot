@@ -9,9 +9,12 @@ import org.springframework.context.annotation.Profile;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.secretsmanager.AWSSecretsManager;
+import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.sendgrid.SendGrid;
@@ -53,21 +56,6 @@ public class GithubAppConfig {
 
   @Value("${firebase.web.api.key}")
   private String firebaseWebApiKey;
-
-  @Value("${elasticsearch.host}")
-  private String clusterNode;
-
-  @Value("${elasticsearch.httptype}")
-  private String clusterHttpType;
-
-  @Value("${elasticsearch.username}")
-  private String username;
-
-  @Value("${elasticsearch.password}")
-  private String password;
-
-  @Value("${elasticsearch.port:9200}")
-  private int clusterHttpPort;
 
   @Autowired
   private AwsSecretsManagerService awsSecretsManagerService;
@@ -158,25 +146,21 @@ public class GithubAppConfig {
     return sendGrid;
   }
 
-  // @Bean
-  // public JavaMailSender javaMailSender() {
-  // JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-  // mailSender.setHost("smtp.sendgrid.net");
-  // mailSender.setPort(587);
-  //
-  // SMTPSecrets sMTPSecrets = awsSecretsManagerService.getSMTPSecrets();
-  //
-  // mailSender.setUsername(sMTPSecrets.getUsername());
-  // mailSender.setPassword(sMTPSecrets.getPassword());
-  //
-  // Properties props = mailSender.getJavaMailProperties();
-  // props.put("mail.transport.protocol", "smtp");
-  // props.put("mail.smtp.auth", "true");
-  // props.put("mail.smtp.starttls.enable", "true");
-  // props.put("mail.debug", "true");
-  //
-  // return mailSender;
-  // }
+  /**
+   * from github secrets
+   */
+  @Value("${aws.secret.key}")
+  private String awsSecretkey;
 
+  @Bean
+  public AWSSecretsManager awsSecretsManager(AWSCredentialsProvider aWSCredentialsProvider) {
+    String endpoint = "secretsmanager." + getTargetRegion().getName() + ".amazonaws.com";
+    AwsClientBuilder.EndpointConfiguration config =
+        new AwsClientBuilder.EndpointConfiguration(endpoint, getTargetRegion().getName());
+    AWSSecretsManagerClientBuilder clientBuilder = AWSSecretsManagerClientBuilder.standard();
+    clientBuilder.setEndpointConfiguration(config);
+    clientBuilder.setCredentials(aWSCredentialsProvider);
+    return clientBuilder.build();
+  }
 
 }

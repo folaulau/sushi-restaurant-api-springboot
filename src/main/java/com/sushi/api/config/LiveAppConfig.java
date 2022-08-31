@@ -5,6 +5,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.secretsmanager.AWSSecretsManager;
+import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.sendgrid.SendGrid;
 import com.sushi.api.library.aws.secretsmanager.AwsSecretsManagerService;
 import com.sushi.api.library.aws.secretsmanager.DatabaseSecrets;
@@ -19,7 +29,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Profile(value = {"prod"})
+@Profile(value = {"dev","prod"})
 @Configuration
 public class LiveAppConfig {
 
@@ -97,24 +107,40 @@ public class LiveAppConfig {
     return sendGrid;
   }
 
-  // @Bean
-  // public JavaMailSender javaMailSender() {
-  // JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-  // mailSender.setHost("smtp.sendgrid.net");
-  // mailSender.setPort(587);
-  //
-  // SMTPSecrets sMTPSecrets = awsSecretsManagerService.getSMTPSecrets();
-  //
-  // mailSender.setUsername(sMTPSecrets.getUsername());
-  // mailSender.setPassword(sMTPSecrets.getPassword());
-  //
-  // Properties props = mailSender.getJavaMailProperties();
-  // props.put("mail.transport.protocol", "smtp");
-  // props.put("mail.smtp.auth", "true");
-  // props.put("mail.smtp.starttls.enable", "true");
-  // props.put("mail.debug", "true");
-  //
-  // return mailSender;
-  // }
+  /**
+   * AWS
+   */
+
+  private Regions getTargetRegion() {
+    return Regions.fromName(targetRegion);
+  }
+
+  @Bean
+  public AWSCredentialsProvider amazonAWSCredentialsProvider() {
+    return DefaultAWSCredentialsProviderChain.getInstance();
+  }
+
+  @Bean
+  public AmazonS3 amazonS3() {
+    return AmazonS3ClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
+        .withRegion(getTargetRegion()).build();
+  }
+
+  @Bean
+  public AmazonSimpleEmailService amazonSES() {
+    return AmazonSimpleEmailServiceClientBuilder.standard()
+        .withCredentials(amazonAWSCredentialsProvider()).withRegion(getTargetRegion()).build();
+  }
+
+  @Bean
+  public AWSSecretsManager awsSecretsManager(AWSCredentialsProvider aWSCredentialsProvider) {
+    String endpoint = "secretsmanager." + getTargetRegion().getName() + ".amazonaws.com";
+    AwsClientBuilder.EndpointConfiguration config =
+        new AwsClientBuilder.EndpointConfiguration(endpoint, getTargetRegion().getName());
+    AWSSecretsManagerClientBuilder clientBuilder = AWSSecretsManagerClientBuilder.standard();
+    clientBuilder.setEndpointConfiguration(config);
+    clientBuilder.setCredentials(aWSCredentialsProvider);
+    return clientBuilder.build();
+  }
 
 }

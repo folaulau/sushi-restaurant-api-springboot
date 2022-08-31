@@ -5,6 +5,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.secretsmanager.AWSSecretsManager;
+import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 import com.sushi.api.library.aws.secretsmanager.XApiKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -33,23 +41,8 @@ public class LocalAppConfig {
   @Value("${aws.deploy.region:us-west-2}")
   private String targetRegion;
 
-//  @Value("${spring.mail.username}")
-//  private String smtpUsername;
-//
-//  @Value("${spring.mail.password}")
-//  private String smtpPassword;
-
-//  @Bean(name = "stripeSecrets")
-//  public StripeSecrets stripeSecrets(@Value("${stripe.publishable.key}") String publishableKey,
-//      @Value("${stripe.secret.key}") String secretKey, @Value("${stripe.product}") String productId,
-//      @Value("${stripe.webhook.signing.key}") String webhookSigningKey) {
-//    return new StripeSecrets(publishableKey, secretKey, productId, webhookSigningKey);
-//  }
-
-
   @Bean(name = "xApiKey")
-  public XApiKey xApiKeySecrets(
-      @Value("${web.x.api.key}") String webXApiKey,
+  public XApiKey xApiKeySecrets(@Value("${web.x.api.key}") String webXApiKey,
       @Value("${mobile.x.api.key}") String mobileXApiKey,
       @Value("${utility.x.api.key}") String utilityXApiKey) {
     return new XApiKey(webXApiKey, mobileXApiKey, utilityXApiKey);
@@ -87,37 +80,32 @@ public class LocalAppConfig {
     return hds;
   }
 
-//  @Bean
-//  public SendGrid sendGrid() {
-//    SendGrid sendGrid = new SendGrid(smtpPassword);
-//    return sendGrid;
-//  }
-//
-//  @Bean
-//  public JavaMailSender javaMailSender() {
-//    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-//    mailSender.setHost("smtp.sendgrid.net");
-//    mailSender.setPort(465);
-//    mailSender.setUsername(smtpUsername);
-//    mailSender.setPassword(smtpPassword);
-//
-//    /**
-//     * spring.mail.host=email-smtp.us-east-1.amazonaws.com
-//     * spring.mail.properties.mail.transport.protocol=smtp spring.mail.properties.mail.smtp.port=587
-//     * spring.mail.properties.mail.smtp.auth=true
-//     * spring.mail.properties.mail.smtp.starttls.enable=true
-//     * spring.mail.properties.mail.smtp.starttls.required=true
-//     * spring.mail.properties.mail.sender=no-reply@
-//     */
-//    Properties props = mailSender.getJavaMailProperties();
-//    props.put("mail.transport.protocol", "smtp");
-//    props.put("mail.smtp.port", "465");
-//    props.put("mail.smtp.auth", "true");
-//    props.put("mail.smtp.ssl.trust", "smtp.sendgrid.net");
-//    props.put("mail.smtp.starttls.enable", "true");
-//    props.put("mail.smtp.starttls.required", "true");
-//    props.put("mail.debug", "true");
-//
-//    return mailSender;
-//  }
+  private Regions getTargetRegion() {
+    if (targetRegion == null) {
+      targetRegion = "us-west-2";
+    }
+    return Regions.fromName(targetRegion);
+  }
+
+  @Bean
+  public AWSCredentialsProvider amazonAWSCredentialsProvider() {
+    return new ProfileCredentialsProvider("folauk110");
+  }
+
+  @Bean
+  public AmazonS3 amazonS3() {
+    return AmazonS3ClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
+        .withRegion(getTargetRegion()).build();
+  }
+
+  @Bean
+  public AWSSecretsManager awsSecretsManager(AWSCredentialsProvider aWSCredentialsProvider) {
+    String endpoint = "secretsmanager." + getTargetRegion().getName() + ".amazonaws.com";
+    AwsClientBuilder.EndpointConfiguration config =
+        new AwsClientBuilder.EndpointConfiguration(endpoint, getTargetRegion().getName());
+    AWSSecretsManagerClientBuilder clientBuilder = AWSSecretsManagerClientBuilder.standard();
+    clientBuilder.setEndpointConfiguration(config);
+    clientBuilder.setCredentials(aWSCredentialsProvider);
+    return clientBuilder.build();
+  }
 }

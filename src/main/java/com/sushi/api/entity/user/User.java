@@ -4,17 +4,25 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -31,6 +39,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.sushi.api.entity.DatabaseTableNames;
 import com.sushi.api.entity.account.Account;
+import com.sushi.api.entity.address.Address;
+import com.sushi.api.entity.role.Role;
 import com.sushi.api.utils.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -69,6 +79,9 @@ public class User implements Serializable {
   @Column(name = "last_name", nullable = false)
   private String lastName;
 
+  @Column(name = "third_party_name", nullable = false)
+  private String thirdPartyName;
+
   @Column(name = "email", nullable = false, unique = true)
   private String email;
 
@@ -77,6 +90,13 @@ public class User implements Serializable {
 
   @Column(name = "dob", nullable = true)
   private LocalDate dob;
+
+  /**
+   * Social platforms(facebook, google, etc) don't give email<br>
+   * Now create a temp email for now
+   */
+  @Column(name = "email_temp")
+  private boolean emailTemp;
 
   @JsonIgnoreProperties(value = {"users"})
   @JoinColumn(name = "account_id")
@@ -93,6 +113,38 @@ public class User implements Serializable {
   @UpdateTimestamp
   @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status")
+  private UserStatus status;
+
+  @JsonIgnoreProperties(value = {"user"})
+  @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+  private Address address;
+
+  @JsonIgnoreProperties(value = {"users"})
+  @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @JoinTable(name = "user_roles", joinColumns = {@JoinColumn(name = "parent_id")},
+      inverseJoinColumns = {@JoinColumn(name = "role_id")})
+  private Set<Role> roles;
+
+  public void addRole(Role role) {
+    if (this.roles == null) {
+      this.roles = new HashSet<>();
+    }
+    this.roles.add(role);
+  }
+
+  public String getRoleAsString() {
+    if (this.roles == null) {
+      return null;
+    }
+    return this.roles.stream().findFirst().get().getUserType().name();
+  }
+
+  public boolean isActive() {
+    return Optional.ofNullable(this.status).orElse(UserStatus.NONE).equals(UserStatus.ACTIVE);
+  }
 
   @Override
   public int hashCode() {
@@ -129,9 +181,27 @@ public class User implements Serializable {
   @PrePersist
   private void preCreate() {
     if (this.uuid == null || this.uuid.isEmpty()) {
-      this.uuid = "user-"+ UUID.randomUUID().toString();
+      this.uuid = "user-" + UUID.randomUUID().toString();
     }
 
+  }
+
+  public String getFullName() {
+    StringBuilder fullname = new StringBuilder();
+
+    if (this.firstName != null && !this.firstName.isEmpty()) {
+      fullname.append(this.firstName);
+    }
+
+    if (this.lastName != null && !this.lastName.isEmpty()) {
+      if (fullname.toString().isEmpty()) {
+        fullname.append(this.lastName);
+      } else {
+        fullname.append(" " + this.lastName);
+      }
+    }
+
+    return fullname.toString();
   }
 
 }

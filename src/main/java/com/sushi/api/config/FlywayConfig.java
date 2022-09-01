@@ -8,10 +8,10 @@ import org.springframework.context.annotation.DependsOn;
 
 @DependsOn("dataSource")
 @Configuration
-public class FlywayConfiguration {
+public class FlywayConfig {
 
   @Autowired
-  public FlywayConfiguration(DataSource dataSource) {
+  public FlywayConfig(DataSource dataSource) {
     Flyway.configure().baselineOnMigrate(true).dataSource(dataSource).load().migrate();
     
     // Flyway flyway = Flyway.configure().dataSource(url, user, password).load();

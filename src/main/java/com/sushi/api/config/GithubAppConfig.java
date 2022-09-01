@@ -65,6 +65,13 @@ public class GithubAppConfig {
   @Value("${firebase.web.api.key}")
   private String firebaseWebApiKey;
 
+
+  /**
+   * from github secrets
+   */
+  @Value("${aws.secret.key}")
+  private String awsSecretkey;
+
   @Autowired
   private AwsSecretsManagerService awsSecretsManagerService;
 
@@ -154,12 +161,6 @@ public class GithubAppConfig {
     return sendGrid;
   }
 
-  /**
-   * from github secrets
-   */
-  @Value("${aws.secret.key}")
-  private String awsSecretkey;
-
   @Bean
   public AWSSecretsManager awsSecretsManager(AWSCredentialsProvider aWSCredentialsProvider) {
     String endpoint = "secretsmanager." + getTargetRegion().getName() + ".amazonaws.com";
@@ -189,7 +190,7 @@ public class GithubAppConfig {
     FirebaseSecrets firebaseSecrets = awsSecretsManagerService.getFirebaseSecrets();
 
     try {
-          // @formatter:off
+      // @formatter:off
           InputStream is = new ByteArrayInputStream(firebaseSecrets.getAdminFileContent().getBytes());
           
           FirebaseOptions options = FirebaseOptions.builder()

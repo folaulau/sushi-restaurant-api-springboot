@@ -30,4 +30,9 @@ public class UserDAOImp implements UserDAO {
   public Optional<User> findByUuid(String uuid) {
     return userRepository.findByUuid(uuid);
   }
+
+  @Override
+  public Optional<User> findByEmail(String email) {
+    return userRepository.findByEmail(email);
+  }
 }

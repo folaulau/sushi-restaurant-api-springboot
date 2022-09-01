@@ -10,6 +10,7 @@ import org.mapstruct.Mappings;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import com.sushi.api.entity.user.User;
 
 // @formatter:off
 @Mapper(componentModel = "spring", 
@@ -18,5 +19,7 @@ unmappedTargetPolicy = ReportingPolicy.IGNORE,
 nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 //@formatter:on
 public interface EntityDTOMapper {
+
+  AuthenticationResponseDTO mapUserToAuthenticationResponse(User user);
   
 }

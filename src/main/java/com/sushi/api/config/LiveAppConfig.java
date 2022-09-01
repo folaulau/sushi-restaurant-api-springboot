@@ -1,10 +1,14 @@
 package com.sushi.api.config;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.client.builder.AwsClientBuilder;
@@ -15,9 +19,16 @@ import com.amazonaws.services.secretsmanager.AWSSecretsManager;
 import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.Firestore;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.cloud.FirestoreClient;
 import com.sendgrid.SendGrid;
 import com.sushi.api.library.aws.secretsmanager.AwsSecretsManagerService;
 import com.sushi.api.library.aws.secretsmanager.DatabaseSecrets;
+import com.sushi.api.library.aws.secretsmanager.FirebaseSecrets;
 import com.sushi.api.library.aws.secretsmanager.SMTPSecrets;
 import com.sushi.api.library.aws.secretsmanager.StripeSecrets;
 import com.sushi.api.library.aws.secretsmanager.TwilioSecrets;
@@ -29,7 +40,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Profile(value = {"dev","prod"})
+@Profile(value = {"dev", "prod"})
 @Configuration
 public class LiveAppConfig {
 
@@ -141,6 +152,53 @@ public class LiveAppConfig {
     clientBuilder.setEndpointConfiguration(config);
     clientBuilder.setCredentials(aWSCredentialsProvider);
     return clientBuilder.build();
+  }
+
+  @Bean
+  public FirebaseApp firebaseApp() {
+    FirebaseApp firebaseApp = null;
+    try {
+      if (FirebaseApp.getInstance() != null) {
+        firebaseApp = FirebaseApp.getInstance();
+        log.info("MyFirebase config had already been set up, name: " + firebaseApp.getName());
+        return firebaseApp;
+      } else {
+        log.info("MyFirebase config is null. Configuring one...");
+      }
+    } catch (Exception e) {
+      log.warn("FirebaseApp Exception, msg: " + e.getLocalizedMessage());
+    }
+
+    FirebaseSecrets firebaseSecrets = awsSecretsManagerService.getFirebaseSecrets();
+
+    try {
+          // @formatter:off
+          InputStream is = new ByteArrayInputStream(firebaseSecrets.getAdminFileContent().getBytes());
+          
+          FirebaseOptions options = FirebaseOptions.builder()
+                  .setCredentials(GoogleCredentials.fromStream(is))
+                  .build();
+          
+          // @formatter:on
+      firebaseApp = FirebaseApp.initializeApp(options);
+      log.info("MyFirebase config has been set up, name: " + firebaseApp.getName());
+      return firebaseApp;
+    } catch (Exception e) {
+      log.error("FirebaseApp Exception, msg: " + e.getLocalizedMessage());
+    }
+    log.info("FirebaseApp is null. Do something...");
+    return firebaseApp;
+  }
+
+  @Bean
+  public FirebaseAuth firebaseAuth() {
+    return FirebaseAuth.getInstance(firebaseApp());
+  }
+
+  @DependsOn(value = "firebaseApp")
+  @Bean
+  public Firestore firestore() {
+    return FirestoreClient.getFirestore();
   }
 
 }

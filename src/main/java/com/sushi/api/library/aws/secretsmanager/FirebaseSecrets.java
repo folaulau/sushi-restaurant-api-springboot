@@ -14,21 +14,23 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 public class FirebaseSecrets implements Serializable {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
-    private String            authWebApiKey;
+  private String authWebApiKey;
 
-    public static FirebaseSecrets fromJson(String json) {
+  private String adminFileContent;
 
-        try {
-            return ObjectUtils.getObjectMapper().readValue(json, FirebaseSecrets.class);
-        } catch (IOException e) {
-            log.error("SecretManager to Json exception", e);
-            return null;
-        }
+  public static FirebaseSecrets fromJson(String json) {
+
+    try {
+      return ObjectUtils.getObjectMapper().readValue(json, FirebaseSecrets.class);
+    } catch (IOException e) {
+      log.error("SecretManager to Json exception", e);
+      return null;
     }
+  }
 
 }

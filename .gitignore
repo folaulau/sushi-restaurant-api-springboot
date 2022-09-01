@@ -34,3 +34,5 @@ build/
 
 ### Local Secrets ###
 src/main/resources/config/local-secrets.properties
+
+src/main/resources/config/sushi-restaurant-firebase-adminsdk.json

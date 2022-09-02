@@ -18,25 +18,25 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class AwsSecretsManagerServiceImp implements AwsSecretsManagerService {
 
-  @Value("${database.secret.name}")
+  @Value("${database.secret.name:placeholder}")
   private String databaseSecretName;
 
-  @Value("${stripe.secret.name}")
+  @Value("${stripe.secret.name:placeholder}")
   private String stripeSecretName;
 
-  @Value("${twilio.secret.name}")
+  @Value("${twilio.secret.name:placeholder}")
   private String twilioSecretName;
 
   @Value("${firebase.secret.name}")
   private String firebaseSecretName;
 
-  @Value("${elasticsearch.secret.name}")
+  @Value("${elasticsearch.secret.name:placeholder}")
   private String elasticsearchSecretName;
 
-  @Value("${xapikey.secret.name}")
+  @Value("${xapikey.secret.name:placeholder}")
   private String xApiKeySecretName;
 
-  @Value("${smtp.secret.name}")
+  @Value("${smtp.secret.name:placeholder}")
   private String smtpSecretName;
 
 

@@ -132,15 +132,15 @@ public class GithubAppConfig {
     return hds;
   }
 
-  @Bean(name = "xApiKey")
-  public XApiKey xApiKeySecrets() {
-    return awsSecretsManagerService.getXApiKeys();
-  }
+//  @Bean(name = "xApiKey")
+//  public XApiKey xApiKeySecrets() {
+//    return awsSecretsManagerService.getXApiKeys();
+//  }
 
-  @Bean(name = "stripeSecrets")
-  public StripeSecrets stripeSecrets() {
-    return awsSecretsManagerService.getStripeSecrets();
-  }
+//  @Bean(name = "stripeSecrets")
+//  public StripeSecrets stripeSecrets() {
+//    return awsSecretsManagerService.getStripeSecrets();
+//  }
 
   @Bean(name = "queue")
   public String queue(@Value("${queue}") String queue) {
@@ -154,12 +154,12 @@ public class GithubAppConfig {
     return firebaseSecrets;
   }
 
-  @Bean
-  public SendGrid sendGrid() {
-    SMTPSecrets sMTPSecrets = awsSecretsManagerService.getSMTPSecrets();
-    SendGrid sendGrid = new SendGrid(sMTPSecrets.getPassword());
-    return sendGrid;
-  }
+//  @Bean
+//  public SendGrid sendGrid() {
+//    SMTPSecrets sMTPSecrets = awsSecretsManagerService.getSMTPSecrets();
+//    SendGrid sendGrid = new SendGrid(sMTPSecrets.getPassword());
+//    return sendGrid;
+//  }
 
   @Bean
   public AWSSecretsManager awsSecretsManager(AWSCredentialsProvider aWSCredentialsProvider) {

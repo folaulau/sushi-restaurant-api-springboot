@@ -21,6 +21,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.cloud.FirestoreClient;
+import com.sushi.api.library.aws.secretsmanager.FirebaseSecrets;
 import com.sushi.api.library.aws.secretsmanager.XApiKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -51,6 +52,9 @@ public class LocalAppConfig {
 
   @Value("${firebase.key.file.location}")
   private String firebaseKeyLocation;
+  
+  @Value("${firebase.web.api.key}")
+  private String firebaseWebApiKey;
 
   @Bean(name = "xApiKey")
   public XApiKey xApiKeySecrets(@Value("${web.x.api.key}") String webXApiKey,
@@ -118,6 +122,14 @@ public class LocalAppConfig {
     clientBuilder.setEndpointConfiguration(config);
     clientBuilder.setCredentials(aWSCredentialsProvider);
     return clientBuilder.build();
+  }
+  
+
+  @Bean(name = "firebaseSecrets")
+  public FirebaseSecrets firebaseSecrets() {
+    FirebaseSecrets firebaseSecrets = new FirebaseSecrets();
+    firebaseSecrets.setAuthWebApiKey(firebaseWebApiKey);
+    return firebaseSecrets;
   }
 
   @Bean

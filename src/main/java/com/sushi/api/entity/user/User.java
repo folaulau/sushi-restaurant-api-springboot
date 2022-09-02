@@ -73,13 +73,13 @@ public class User implements Serializable {
   @Column(name = "uuid", unique = true, nullable = false, updatable = false)
   private String uuid;
 
-  @Column(name = "first_name", nullable = false)
+  @Column(name = "first_name", nullable = true)
   private String firstName;
 
-  @Column(name = "last_name", nullable = false)
+  @Column(name = "last_name", nullable = true)
   private String lastName;
 
-  @Column(name = "third_party_name", nullable = false)
+  @Column(name = "third_party_name")
   private String thirdPartyName;
 
   @Column(name = "email", nullable = false, unique = true)

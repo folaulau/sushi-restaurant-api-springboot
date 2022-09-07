@@ -88,7 +88,7 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
                 .setAmount(totalChargeAsCents)
                 .putMetadata("env", env);
 
-        if (user.getAccount().getStripeCustomerId() != null) {
+        if (user!=null && user.getAccount().getStripeCustomerId() != null) {
           builder.setCustomer(user.getAccount().getStripeCustomerId());
         }
 
@@ -115,7 +115,7 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
               .putMetadata("env", env);
       //@formatter:on
 
-      if (user.getAccount().getStripeCustomerId() != null) {
+      if (user != null && user.getAccount().getStripeCustomerId() != null) {
         builder.setCustomer(user.getAccount().getStripeCustomerId());
       }
 
@@ -135,17 +135,21 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
 
     PaymentIntentDTO paymentIntentDTO = new PaymentIntentDTO();
 
-    try {
-      com.stripe.model.EphemeralKey key = com.stripe.model.EphemeralKey.create(
-          EphemeralKeyCreateParams.builder().setCustomer(user.getAccount().getStripeCustomerId())
-              .build(),
-          RequestOptions.builder().setReadTimeout(60 * 1000)
-              .setStripeVersionOverride(Stripe.API_VERSION).build());
-      paymentIntentDTO.setEphemeralKey(key.getSecret());
+    if (user != null && user.getAccount().getStripeCustomerId() != null) {
+      try {
+        com.stripe.model.EphemeralKey key = com.stripe.model.EphemeralKey.create(
+            EphemeralKeyCreateParams.builder().setCustomer(user.getAccount().getStripeCustomerId())
+                .build(),
+            RequestOptions.builder().setReadTimeout(60 * 1000)
+                .setStripeVersionOverride(Stripe.API_VERSION).build());
+        paymentIntentDTO.setEphemeralKey(key.getSecret());
 
-    } catch (StripeException e) {
-      log.warn("StripeException - createParentPaymentIntent EphemeralKey, msg={}", e.getMessage());
+      } catch (StripeException e) {
+        log.warn("StripeException - createParentPaymentIntent EphemeralKey, msg={}",
+            e.getMessage());
+      }
     }
+
 
     paymentIntentDTO.setId(paymentIntent.getId());
     paymentIntentDTO.setClientSecret(paymentIntent.getClientSecret());

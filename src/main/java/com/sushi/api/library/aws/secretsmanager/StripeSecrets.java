@@ -27,10 +27,6 @@ public class StripeSecrets implements Serializable {
 
     private String            secretKey;
 
-    private String            productId;
-
-    private String            webhookSigningSecret;
-
     public static StripeSecrets fromJson(String json) {
 
         try {

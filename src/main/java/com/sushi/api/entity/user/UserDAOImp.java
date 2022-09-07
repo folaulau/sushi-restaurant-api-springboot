@@ -28,6 +28,9 @@ public class UserDAOImp implements UserDAO {
 
   @Override
   public Optional<User> findByUuid(String uuid) {
+    if (uuid == null || uuid.isEmpty()) {
+      return Optional.empty();
+    }
     return userRepository.findByUuid(uuid);
   }
 

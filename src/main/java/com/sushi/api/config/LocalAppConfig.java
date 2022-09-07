@@ -22,6 +22,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.cloud.FirestoreClient;
 import com.sushi.api.library.aws.secretsmanager.FirebaseSecrets;
+import com.sushi.api.library.aws.secretsmanager.StripeSecrets;
 import com.sushi.api.library.aws.secretsmanager.XApiKey;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -55,6 +56,12 @@ public class LocalAppConfig {
   
   @Value("${firebase.web.api.key}")
   private String firebaseWebApiKey;
+  
+  @Bean(name = "stripeSecrets")
+  public StripeSecrets stripeSecrets(@Value("${stripe.publishable.key}") String publishableKey,
+      @Value("${stripe.secret.key}") String secretKey) {
+    return new StripeSecrets(publishableKey, secretKey);
+  }
 
   @Bean(name = "xApiKey")
   public XApiKey xApiKeySecrets(@Value("${web.x.api.key}") String webXApiKey,

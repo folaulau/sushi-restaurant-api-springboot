@@ -98,6 +98,11 @@ public class GithubAppConfig {
     return AmazonSimpleEmailServiceClientBuilder.standard()
         .withCredentials(amazonAWSCredentialsProvider()).withRegion(Regions.US_WEST_2).build();
   }
+  
+  @Bean(name = "stripeSecrets")
+  public StripeSecrets stripeSecrets() {
+    return awsSecretsManagerService.getStripeSecrets();
+  }
 
   /* ================== datasource =============== */
   @DependsOn("amazonAWSCredentialsProvider")

@@ -1,21 +1,16 @@
-package com.sushi.api.entity.account;
+package com.sushi.api.entity.product;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.ResultCheckStyle;
@@ -25,12 +20,12 @@ import org.hibernate.annotations.Where;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.sushi.api.entity.DatabaseTableNames;
-import com.sushi.api.utils.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 
 @Builder
 @Setter
@@ -40,12 +35,12 @@ import lombok.Setter;
 @JsonInclude(value = Include.NON_NULL)
 @DynamicUpdate
 @Entity
-@SQLDelete(sql = "UPDATE " + DatabaseTableNames.ACCOUNT + " SET deleted = 'T' WHERE id = ?",
+@SQLDelete(sql = "UPDATE " + DatabaseTableNames.PRODUCT + " SET deleted = 'T' WHERE id = ?",
     check = ResultCheckStyle.NONE)
 @Where(clause = "deleted = 'F'")
-@Table(name = DatabaseTableNames.ACCOUNT,
+@Table(name = DatabaseTableNames.PRODUCT,
     indexes = {@Index(columnList = "uuid"), @Index(columnList = "deleted")})
-public class Account implements Serializable {
+public class Product implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -54,14 +49,38 @@ public class Account implements Serializable {
   @Column(name = "id", nullable = false, updatable = false, unique = true)
   private Long id;
 
+  @Enumerated(EnumType.STRING)
   @Column(name = "uuid", unique = true, nullable = false, updatable = false)
-  private String uuid;
+  private ProductName uuid;
+
+  // star rating
+  @Column(name = "rating")
+  private Integer rating;
+
+  @Column(name = "price", nullable = false)
+  private Double price;
+
+  @Column(name = "image_url")
+  private String imageUrl;
+
+  @Column(name = "title", nullable = false)
+  private String title;
+
+  @Column(name = "description", nullable = true, length = 2500)
+  private String description;
+
+  @Column(name = "calories", nullable = true)
+  private String calories;
+
+  /**
+   * sushi, drink, dessert, etc
+   */
+  @Enumerated(EnumType.STRING)
+  @Column(name = "type", nullable = false)
+  private ProductType type;
 
   @Column(name = "deleted", nullable = false)
   private boolean deleted;
-
-  @Column(name = "stripe_customer_id", nullable = true)
-  private String stripeCustomerId;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
@@ -70,46 +89,5 @@ public class Account implements Serializable {
   @UpdateTimestamp
   @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
-
-
-  @Override
-  public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(this.id).append(this.uuid).toHashCode();
-
-    // return HashCodeBuilder.reflectionHashCode(this);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (obj == this) {
-      return true;
-    }
-    if (obj.getClass() != getClass()) {
-      return false;
-    }
-    Account other = (Account) obj;
-    return new EqualsBuilder().append(this.id, other.id).append(this.uuid, other.uuid).isEquals();
-  }
-
-  @Override
-  public String toString() {
-    // TODO Auto-generated method stub
-    return ToStringBuilder.reflectionToString(this);
-  }
-
-  public String toJson() {
-    return ObjectUtils.toJson(this);
-  }
-
-  @PrePersist
-  private void preCreate() {
-    if (this.uuid == null || this.uuid.isEmpty()) {
-      this.uuid = "account-" + UUID.randomUUID().toString();
-    }
-
-  }
 
 }

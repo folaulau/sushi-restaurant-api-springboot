@@ -3,6 +3,7 @@ package com.sushi.api.library.stripe.paymentintent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,10 +12,14 @@ import org.springframework.stereotype.Service;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import com.sushi.api.dto.LineItemDTO;
+import com.sushi.api.dto.OrderRequestDTO;
 import com.sushi.api.dto.PaymentIntentCreateDTO;
 import com.sushi.api.dto.ProductUuidDTO;
+import com.sushi.api.entity.order.lineitem.LineItem;
 import com.sushi.api.entity.product.Product;
 import com.sushi.api.entity.product.ProductDAO;
+import com.sushi.api.entity.product.ProductName;
 import com.sushi.api.entity.user.User;
 import com.sushi.api.entity.user.UserDAO;
 import com.sushi.api.exception.ApiException;
@@ -37,8 +42,7 @@ public class StripePaymentIntentValidatorServiceImp implements StripePaymentInte
   private StripeSecrets stripeSecrets;
 
   @Override
-  public Triple<User, PaymentIntent, List<Product>> validateCreatePaymentIntent(
-      PaymentIntentCreateDTO paymentIntentCreateDTO) {
+  public Triple<User, PaymentIntent, List<LineItem>> validateCreatePaymentIntent(PaymentIntentCreateDTO paymentIntentCreateDTO) {
 
 
     Stripe.apiKey = stripeSecrets.getSecretKey();
@@ -75,27 +79,29 @@ public class StripePaymentIntentValidatorServiceImp implements StripePaymentInte
 
 
 
-    List<ProductUuidDTO> productUuids = paymentIntentCreateDTO.getProducts();
+    Set<LineItemDTO> lineItemDTOs = paymentIntentCreateDTO.getLineItems();
 
-    if (productUuids == null || productUuids.isEmpty()) {
-      throw new ApiException("Empty order", "products size=" + productUuids.size());
+    if (lineItemDTOs == null || lineItemDTOs.isEmpty()) {
+      throw new ApiException("Empty order", "products size=" + lineItemDTOs.size());
     }
 
-    List<Product> products = new ArrayList<>();
+    List<LineItem> products = new ArrayList<>();
 
-    for (ProductUuidDTO uuidDTO : productUuids) {
-
-      if (uuidDTO.getUuid() == null) {
+    for (LineItemDTO lineItemDTO : lineItemDTOs) {
+      ProductName uuid = lineItemDTO.getProduct().getUuid();
+      
+      
+      if (uuid == null) {
         throw new ApiException("Product not found",
-            "product not found for uuid=" + uuidDTO.getUuid());
+            "product not found for uuid=" + uuid);
       }
 
-      Product product = productDAO.getByUuid(uuidDTO.getUuid())
+      Product product = productDAO.getByUuid(uuid)
           .orElseThrow(() -> new ApiException("Product not found",
-              "product not found for uuid=" + uuidDTO.getUuid()));
+              "product not found for uuid=" + uuid));
 
 
-      products.add(product);
+//      products.add(product);
 
     }
 

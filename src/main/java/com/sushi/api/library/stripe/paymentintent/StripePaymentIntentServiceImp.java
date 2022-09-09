@@ -15,6 +15,7 @@ import com.stripe.param.EphemeralKeyCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import com.sushi.api.dto.EntityDTOMapper;
 import com.sushi.api.dto.PaymentIntentDTO;
+import com.sushi.api.entity.order.lineitem.LineItem;
 import com.sushi.api.entity.product.Product;
 import com.sushi.api.entity.user.User;
 import com.sushi.api.dto.PaymentIntentCreateDTO;
@@ -64,14 +65,14 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
   public PaymentIntentDTO createPaymentIntent(PaymentIntentCreateDTO paymentIntentParentDTO) {
     Stripe.apiKey = stripeSecrets.getSecretKey();
 
-    Triple<User, PaymentIntent, List<Product>> triple =
+    Triple<User, PaymentIntent, List<LineItem>> triple =
         stripePaymentIntentValidatorService.validateCreatePaymentIntent(paymentIntentParentDTO);
 
     User user = triple.getLeft();
 
     PaymentIntent paymentIntent = triple.getMiddle();
 
-    List<Product> products = triple.getRight();
+    List<LineItem> products = triple.getRight();
 
     long totalChargeAsCents = BigDecimal.valueOf(123).multiply(BigDecimal.valueOf(100)).longValue();
 
@@ -110,7 +111,7 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
       com.stripe.param.PaymentIntentCreateParams.Builder builder = PaymentIntentCreateParams.builder()
               .addPaymentMethodType("card")
               .setAmount(totalChargeAsCents)
-              .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.MANUAL)
+              .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
               .setCurrency("usd")
               .putMetadata("env", env);
       //@formatter:on
@@ -136,6 +137,9 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
     PaymentIntentDTO paymentIntentDTO = new PaymentIntentDTO();
 
     if (user != null && user.getAccount().getStripeCustomerId() != null) {
+      
+      paymentIntentDTO.setStripeCustomerId(user.getAccount().getStripeCustomerId());    
+      
       try {
         com.stripe.model.EphemeralKey key = com.stripe.model.EphemeralKey.create(
             EphemeralKeyCreateParams.builder().setCustomer(user.getAccount().getStripeCustomerId())
@@ -148,6 +152,7 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
         log.warn("StripeException - createParentPaymentIntent EphemeralKey, msg={}",
             e.getMessage());
       }
+      
     }
 
 

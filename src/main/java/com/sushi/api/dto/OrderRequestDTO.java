@@ -2,6 +2,7 @@ package com.sushi.api.dto;
 
 import java.io.Serializable;
 import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.AllArgsConstructor;
@@ -17,16 +18,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(value = Include.NON_NULL)
-public class PaymentIntentCreateDTO implements Serializable {
+public class OrderRequestDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private String paymentIntentId;
-
-  private boolean savePaymentMethod;
-
+  private String uuid;
+  
   private String userUuid;
-
-  private Set<LineItemDTO> lineItems;
+  
+  private Set<LineItemCreateDTO> lineItems;
 
 }

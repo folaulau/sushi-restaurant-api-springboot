@@ -10,6 +10,10 @@ import org.mapstruct.Mappings;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import com.sushi.api.entity.order.Order;
+import com.sushi.api.entity.order.lineitem.LineItem;
+import com.sushi.api.entity.order.paymentmethod.OrderPaymentMethod;
+import com.sushi.api.entity.paymentmethod.PaymentMethod;
 import com.sushi.api.entity.user.User;
 
 // @formatter:off
@@ -21,5 +25,11 @@ nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
 public interface EntityDTOMapper {
 
   AuthenticationResponseDTO mapUserToAuthenticationResponse(User user);
+
+  OrderPaymentMethod mapPaymentMethodToOrderPaymentMethod(PaymentMethod paymentMethod);
+
+  OrderDTO mapOrderToOrderDTO(Order order);
+
+  LineItem mapLineItemCreateDTOToLineItem(LineItemCreateDTO lineItemCreateDTO);
   
 }

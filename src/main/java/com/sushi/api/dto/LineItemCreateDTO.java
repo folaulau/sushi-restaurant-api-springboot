@@ -1,15 +1,19 @@
 package com.sushi.api.dto;
 
 import java.io.Serializable;
-import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.sushi.api.entity.product.ProductName;
+import com.sushi.api.entity.product.ProductType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Used for creating an Order
+ */
 
 @Builder
 @Setter
@@ -17,16 +21,15 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(value = Include.NON_NULL)
-public class PaymentIntentCreateDTO implements Serializable {
+public class LineItemCreateDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private String paymentIntentId;
+  private String uuid;
 
-  private boolean savePaymentMethod;
+  private ProductUuidDTO product;
 
-  private String userUuid;
+  private int count;
 
-  private Set<LineItemDTO> lineItems;
 
 }

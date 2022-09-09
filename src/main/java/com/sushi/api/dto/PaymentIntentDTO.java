@@ -50,4 +50,6 @@ public class PaymentIntentDTO implements Serializable {
    */
   private String ephemeralKey;
 
+  private String stripeCustomerId;
+
 }

@@ -89,4 +89,9 @@ public interface MathUtils {
     return new BigDecimal(dollars).multiply(BigDecimal.valueOf(100))
         .setScale(2, RoundingMode.HALF_UP).longValue();
   }
+
+  public static Double getDollarsFromCents(Long amount) {
+    return new BigDecimal(amount).divide(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP)
+        .doubleValue();
+  }
 }

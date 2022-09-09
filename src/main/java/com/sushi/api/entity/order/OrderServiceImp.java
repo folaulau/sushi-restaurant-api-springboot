@@ -91,8 +91,12 @@ public class OrderServiceImp implements OrderService {
         lineItem.setProduct(product);
 
       }
+      
+      log.info("lineItem={}", ObjectUtils.toJson(lineItem));
 
       lineItem.setOrder(order);
+      
+      lineItem.setCount(lineItemCreateDTO.getCount());
 
       order.addLineItem(lineItem);
 
@@ -105,7 +109,6 @@ public class OrderServiceImp implements OrderService {
     log.info("order={}", ObjectUtils.toJson(order));
     
     order = orderDAO.save(order);
-
 
     return entityDTOMapper.mapOrderToOrderDTO(order);
   }

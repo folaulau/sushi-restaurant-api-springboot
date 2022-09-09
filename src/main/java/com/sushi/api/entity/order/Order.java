@@ -181,7 +181,7 @@ public class Order implements Serializable {
 
     return this.lineItems.stream().filter(pro -> {
       return pro.getProduct().getUuid().equals(product.getUuid());
-    }).findFirst().orElse(new LineItem());
+    }).findFirst().orElse(null);
   }
 
 

@@ -35,7 +35,7 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
 
   @Autowired
   private LineItemDAO lineItemDAO;
-  
+
 
   @Override
   public Triple<Order, User, Map<String, LineItem>> validateCreateUpdate(
@@ -55,7 +55,7 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
     if (optOrder.isPresent()) {
       order = optOrder.get();
 
-      if (!order.getUser().equals(user)) {
+      if (user != null && !order.getUser().equals(user)) {
         throw new ApiException("Wrong Order", "order does not belong to userUuid=" + userUuid);
       }
 
@@ -76,15 +76,22 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
 
       String lineItemUuid = lineItemCreateDTO.getUuid();
 
+      ProductUuidDTO productUuidDTO = lineItemCreateDTO.getProduct();
+
       if (lineItemUuid != null && !lineItemUuid.isEmpty()) {
 
-        LineItem lineItem = lineItemDAO.getByUuid(lineItemUuid)
-            .orElseThrow(() -> new ApiException("Lineitem not found",
-                "Lineitem not found for uuid=" + lineItemUuid));
+        LineItem lineItem = order.getLineItem(productUuidDTO);
+
+        if (lineItem == null) {
+          throw new ApiException("Lineitem not found",
+              "Lineitem not found for uuid=" + lineItemUuid);
+        }
 
         if (!lineItem.getOrder().equals(order)) {
           throw new ApiException("Wrong Order", "lineItem does not belong to order=" + uuid);
         }
+
+        lineItems.put(lineItemUuid, lineItem);
 
       } else {
 

@@ -32,7 +32,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
     private HttpServletResponse response;
 
     @Autowired
-    private EntityDTOMapper     entityMapper;
+    private EntityDTOMapper     entityDTOMapper;
 
     @Autowired
     private JwtTokenService     jwtTokenService;
@@ -41,7 +41,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
     public AuthenticationResponseDTO authenticate(User user) {
         String jwt = jwtTokenService.generateUserToken(user);
 
-        AuthenticationResponseDTO auth = entityMapper.mapUserToAuthenticationResponse(user);
+        AuthenticationResponseDTO auth = entityDTOMapper.mapUserToAuthenticationResponse(user);
         auth.setToken(jwt);
         auth.setRole(user.getRoleAsString());
 

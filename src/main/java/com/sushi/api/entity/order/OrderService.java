@@ -5,11 +5,18 @@ import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.sushi.api.dto.OrderDTO;
+import com.sushi.api.dto.OrderRemoveRequestDTO;
 import com.sushi.api.dto.OrderRequestDTO;
 
 public interface OrderService {
 
   OrderDTO createUpdateOrder(@Valid OrderRequestDTO orderRequestDTO);
+
+  OrderDTO getByUuid(String uuid);
+
+  OrderDTO removeAll(String uuid);
+
+  OrderDTO remove(OrderRemoveRequestDTO orderRemoveRequestDTO);
 
 //	Order create(Order order);
 //	

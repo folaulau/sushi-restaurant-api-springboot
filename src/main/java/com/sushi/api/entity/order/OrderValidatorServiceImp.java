@@ -13,6 +13,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import com.sushi.api.dto.LineItemCreateDTO;
 import com.sushi.api.dto.LineItemDTO;
+import com.sushi.api.dto.OrderRemoveRequestDTO;
 import com.sushi.api.dto.OrderRequestDTO;
 import com.sushi.api.dto.ProductUuidDTO;
 import com.sushi.api.entity.order.lineitem.LineItem;
@@ -38,9 +39,8 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
 
 
   @Override
-  public Triple<Order, User, Map<String, LineItem>> validateCreateUpdate(
+  public Triple<Order, User, LineItemCreateDTO> validateCreateUpdate(
       OrderRequestDTO orderRequestDTO) {
-
 
     String userUuid = orderRequestDTO.getUserUuid();
 
@@ -55,7 +55,7 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
     if (optOrder.isPresent()) {
       order = optOrder.get();
 
-      if (user != null && !order.getUser().equals(user)) {
+      if (user != null  && order.getUser()!=null && !order.getUser().equals(user)) {
         throw new ApiException("Wrong Order", "order does not belong to userUuid=" + userUuid);
       }
 
@@ -63,59 +63,88 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
       order = new Order();
     }
 
-    Set<LineItemCreateDTO> lineItemCreateDTOs = orderRequestDTO.getLineItems();
+    LineItemCreateDTO lineItemCreateDTO = orderRequestDTO.getLineItem();
 
-    Map<String, LineItem> lineItems = new HashMap<>();
+    String lineItemUuid = lineItemCreateDTO.getUuid();
 
-    if (lineItemCreateDTOs.isEmpty()) {
-      throw new ApiException("Order is empty",
-          "lineItems list is empty but must have at least 1 item");
+    ProductUuidDTO productUuidDTO = lineItemCreateDTO.getProduct();
+
+    if (lineItemUuid != null && !lineItemUuid.isEmpty()) {
+
+      LineItem lineItem = order.getLineItem(productUuidDTO);
+
+      if (lineItem == null) {
+        throw new ApiException("Lineitem not found", "Lineitem not found for uuid=" + lineItemUuid);
+      }
+
+      if (!lineItem.getOrder().equals(order)) {
+        throw new ApiException("Wrong Order", "lineItem does not belong to order=" + uuid);
+      }
+
+    } else {
+
+      ProductUuidDTO product = lineItemCreateDTO.getProduct();
+
+      if (product == null) {
+        throw new ApiException("Product is empty");
+      }
+
+      ProductName productName = product.getUuid();
+
+      if (productName == null) {
+        throw new ApiException("Product name is empty");
+      }
+
     }
 
-    for (LineItemCreateDTO lineItemCreateDTO : lineItemCreateDTOs) {
+
+
+    return Triple.of(order, user, lineItemCreateDTO);
+
+  }
+
+
+  @Override
+  public Pair<Order, LineItem> validateRemoval(OrderRemoveRequestDTO orderRemoveRequestDTO) {
+
+    String userUuid = orderRemoveRequestDTO.getUserUuid();
+
+    User user = userDAO.findByUuid(userUuid).orElse(null);
+
+    String uuid = orderRemoveRequestDTO.getUuid();
+
+    Order order = orderDAO.findByUuid(uuid)
+        .orElseThrow(() -> new ApiException("Order not found", "order not found for uuid=" + uuid));
+
+    if (user != null && order.getUser()!=null && !order.getUser().equals(user)) {
+      throw new ApiException("Wrong Order", "order does not belong to userUuid=" + userUuid);
+    }
+    
+    order.setUser(user);
+
+    LineItem lineItem = null;
+
+    if (!orderRemoveRequestDTO.isAll()) {
+      LineItemCreateDTO lineItemCreateDTO = orderRemoveRequestDTO.getLineItem();
 
       String lineItemUuid = lineItemCreateDTO.getUuid();
 
       ProductUuidDTO productUuidDTO = lineItemCreateDTO.getProduct();
 
-      if (lineItemUuid != null && !lineItemUuid.isEmpty()) {
+      lineItem = order.getLineItem(productUuidDTO);
 
-        LineItem lineItem = order.getLineItem(productUuidDTO);
-
-        if (lineItem == null) {
-          throw new ApiException("Lineitem not found",
-              "Lineitem not found for uuid=" + lineItemUuid);
-        }
-
-        if (!lineItem.getOrder().equals(order)) {
-          throw new ApiException("Wrong Order", "lineItem does not belong to order=" + uuid);
-        }
-
-        lineItems.put(lineItemUuid, lineItem);
-
-      } else {
-
-        ProductUuidDTO product = lineItemCreateDTO.getProduct();
-
-        if (product == null) {
-          throw new ApiException("Product is empty");
-        }
-
-        ProductName productName = product.getUuid();
-
-        if (productName == null) {
-          throw new ApiException("Product name is empty");
-        }
-
+      if (lineItem == null) {
+        throw new ApiException("Lineitem not found", "Lineitem not found for uuid=" + lineItemUuid);
       }
 
-
+      if (!lineItem.getOrder().equals(order)) {
+        throw new ApiException("Wrong Order", "lineItem does not belong to order=" + uuid);
+      }
+    }else {
+      lineItem = new LineItem();
     }
 
-
-
-    return Triple.of(order, user, lineItems);
-
+    return Pair.of(order, lineItem);
   }
 
 

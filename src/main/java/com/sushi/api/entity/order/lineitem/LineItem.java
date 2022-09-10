@@ -60,9 +60,9 @@ import lombok.Setter;
 @JsonInclude(value = Include.NON_NULL)
 @DynamicUpdate
 @Entity
-@SQLDelete(sql = "UPDATE " + DatabaseTableNames.LINE_ITEM + " SET deleted = 'T' WHERE id = ?",
+@SQLDelete(sql = "UPDATE " + DatabaseTableNames.LINE_ITEM + " SET deleted = true WHERE id = ?",
     check = ResultCheckStyle.NONE)
-@Where(clause = "deleted = 'F'")
+@Where(clause = "deleted = false")
 @Table(name = DatabaseTableNames.LINE_ITEM,
     indexes = {@Index(columnList = "uuid"), @Index(columnList = "deleted")})
 public class LineItem implements Serializable {

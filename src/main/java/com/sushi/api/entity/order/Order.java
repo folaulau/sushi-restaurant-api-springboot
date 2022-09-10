@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -215,6 +216,21 @@ public class Order implements Serializable {
   public void removeLineItem(LineItem lineItem) {
     lineItem.setDeleted(true);
     this.lineItems.remove(lineItem);
+  }
+
+  public void removeAllLineItems() {
+
+    if (this.lineItems == null || this.lineItems.size() == 0) {
+      return;
+    }
+
+    this.lineItems.stream().map(lineItem -> {
+      lineItem.setDeleted(true);
+      return lineItem;
+    }).collect(Collectors.toSet());
+    
+    this.lineItems.removeAll(this.lineItems);
+    
   }
 
   @PrePersist

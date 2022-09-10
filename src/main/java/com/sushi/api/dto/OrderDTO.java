@@ -2,8 +2,11 @@ package com.sushi.api.dto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
-
+import java.util.TreeSet;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.AllArgsConstructor;
@@ -25,7 +28,7 @@ public class OrderDTO implements Serializable {
 
   private String uuid;
 
-  private Set<LineItemDTO> lineItems;
+  private List<LineItemDTO> lineItems;
 
   private int totalItemCount;
 
@@ -43,8 +46,12 @@ public class OrderDTO implements Serializable {
 
   private LocalDateTime paidAt;
 
-  public void setLineItems(Set<LineItemDTO> lineItems) {
+  public void setLineItems(List<LineItemDTO> lineItems) {
     this.lineItems = lineItems;
+    
+    Collections.sort(this.lineItems, (l1, l2) -> {
+      return (int) (l1.getId() - l2.getId());
+    });
 
     if (this.lineItems != null) {
       this.lineItems.forEach((lineItem) -> {

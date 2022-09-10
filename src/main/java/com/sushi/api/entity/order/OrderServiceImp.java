@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import com.sushi.api.dto.EntityDTOMapper;
 import com.sushi.api.dto.LineItemCreateDTO;
 import com.sushi.api.dto.OrderDTO;
+import com.sushi.api.dto.OrderRemoveRequestDTO;
 import com.sushi.api.dto.OrderRequestDTO;
 import com.sushi.api.entity.order.lineitem.LineItem;
 import com.sushi.api.entity.order.lineitem.LineItemDAO;
@@ -34,6 +36,7 @@ import com.sushi.api.entity.product.Product;
 import com.sushi.api.entity.product.ProductDAO;
 import com.sushi.api.entity.product.ProductName;
 import com.sushi.api.entity.user.User;
+import com.sushi.api.exception.ApiException;
 import com.sushi.api.utils.ObjectUtils;
 
 @Service
@@ -59,55 +62,95 @@ public class OrderServiceImp implements OrderService {
   @Autowired
   private OrderValidatorService orderValidatorService;
 
+  
+  /**
+   * Increase or Decrease LineItem count
+   */
   @Override
   public OrderDTO createUpdateOrder(OrderRequestDTO orderRequestDTO) {
-    Triple<Order, User, Map<String, LineItem>> triple =
+    Triple<Order, User, LineItemCreateDTO> triple =
         orderValidatorService.validateCreateUpdate(orderRequestDTO);
 
     Order order = triple.getLeft();
 
     User user = triple.getMiddle();
 
-    Map<String, LineItem> lineItems = triple.getRight();
+    LineItemCreateDTO lineItemCreateDTO = triple.getRight();
 
+    String lineItemUuid = lineItemCreateDTO.getUuid();
 
-    Set<LineItemCreateDTO> lineItemCreateDTOs = orderRequestDTO.getLineItems();
+    LineItem lineItem = null;
 
-    for (LineItemCreateDTO lineItemCreateDTO : lineItemCreateDTOs) {
+    if (lineItemUuid != null && !lineItemUuid.isEmpty()) {
 
-      String lineItemUuid = lineItemCreateDTO.getUuid();
+      lineItem = order.getLineItem(lineItemCreateDTO.getProduct());
 
-      LineItem lineItem = null;
+    } else {
 
-      if (lineItemUuid != null && !lineItemUuid.isEmpty()) {
-        lineItem = lineItems.get(lineItemUuid);
-      } else {
-        lineItem = entityDTOMapper.mapLineItemCreateDTOToLineItem(lineItemCreateDTO);
+      lineItem = entityDTOMapper.mapLineItemCreateDTOToLineItem(lineItemCreateDTO);
 
-        lineItemCreateDTO.getProduct().getUuid();
+      Product product = productDAO.getByUuid(lineItemCreateDTO.getProduct().getUuid()).get();
 
-        Product product = productDAO.getByUuid(lineItemCreateDTO.getProduct().getUuid()).get();
-
-        lineItem.setProduct(product);
-
-      }
-      
-      log.info("lineItem={}", ObjectUtils.toJson(lineItem));
-
-      lineItem.setOrder(order);
-      
-      lineItem.setCount(lineItemCreateDTO.getCount());
-
-      order.addLineItem(lineItem);
-
-      log.info("lineItem={}", ObjectUtils.toJson(lineItem));
+      lineItem.setProduct(product);
 
     }
 
+    lineItem.setCount(lineItemCreateDTO.getCount());
+    order.addLineItem(lineItem);
+    lineItem.setOrder(order);
+    
     order.setUser(user);
-    
+
+
     log.info("order={}", ObjectUtils.toJson(order));
+
+    order = orderDAO.save(order);
+
+    return entityDTOMapper.mapOrderToOrderDTO(order);
+  }
+
+  @Override
+  public OrderDTO getByUuid(String uuid) {
+
+    Optional<Order> optOrder = orderDAO.findByUuid(uuid);
+
+    return entityDTOMapper.mapOrderToOrderDTO(optOrder.orElseThrow(
+        () -> new ApiException("Order not found", "order not found for uuid=" + uuid)));
+  }
+
+  @Override
+  public OrderDTO removeAll(String uuid) {
+    Optional<Order> optOrder = orderDAO.findByUuid(uuid);
+
+    Order order = optOrder
+        .orElseThrow(() -> new ApiException("Order not found", "order not found for uuid=" + uuid));
+
+    order.removeAllLineItems();
+
+    order = orderDAO.save(order);
+
+    return entityDTOMapper.mapOrderToOrderDTO(order);
+  }
+
+  @Override
+  public OrderDTO remove(OrderRemoveRequestDTO orderRemoveRequestDTO) {
+
+    log.info("remove={}", ObjectUtils.toJson(orderRemoveRequestDTO));
     
+    Pair<Order, LineItem> pair = orderValidatorService.validateRemoval(orderRemoveRequestDTO);
+
+    Order order = pair.getFirst();
+
+    LineItem lineItem = pair.getSecond();
+
+    if (orderRemoveRequestDTO.isAll()) {
+      order.removeAllLineItems();
+    } else {
+      lineItem.setDeleted(true);
+      lineItem.setCount(0);
+      order.removeLineItem(lineItem);
+    }
+
     order = orderDAO.save(order);
 
     return entityDTOMapper.mapOrderToOrderDTO(order);

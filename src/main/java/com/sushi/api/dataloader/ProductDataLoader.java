@@ -42,7 +42,8 @@ public class ProductDataLoader implements ApplicationRunner {
       product.setPrice(productName.getPrice());
       product.setTitle(productName.getTitle());
       product.setType(productName.getType());
-
+      product.setImageUrl(productName.getImgUrl());
+      
       productDAO.save(product);
     }
   }

@@ -99,7 +99,7 @@ public class User implements Serializable {
   private boolean emailTemp;
 
   @JsonIgnoreProperties(value = {"users"})
-  @JoinColumn(name = "account_id")
+  @JoinColumn(name = "account_id", nullable = false)
   @ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
   private Account account;
 

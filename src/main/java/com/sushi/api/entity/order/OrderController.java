@@ -65,11 +65,22 @@ public class OrderController {
     return new ResponseEntity<>(orderDTO, HttpStatus.OK);
   }
   
-  @Operation(summary = "Get Order", description = "ge guest order")
+  @Operation(summary = "Get Order", description = "get guest order")
   @GetMapping("/guest/current")
   public ResponseEntity<OrderDTO> getGuestOrder(@Parameter(name = "uuid", required = true,
       example = "uuid") @RequestParam String uuid) {
     log.debug("getGuestOrder({})", uuid);
+
+    OrderDTO orderDTO = orderService.getByUuid(uuid);
+
+    return new ResponseEntity<>(orderDTO, HttpStatus.OK);
+  }
+  
+  @Operation(summary = "Get Order", description = "get order")
+  @GetMapping("/current")
+  public ResponseEntity<OrderDTO> getOrder(@Parameter(name = "uuid", required = true,
+      example = "uuid") @RequestParam String uuid) {
+    log.debug("getOrder({})", uuid);
 
     OrderDTO orderDTO = orderService.getByUuid(uuid);
 

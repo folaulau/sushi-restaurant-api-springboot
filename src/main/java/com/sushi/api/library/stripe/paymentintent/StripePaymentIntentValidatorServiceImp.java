@@ -86,13 +86,10 @@ public class StripePaymentIntentValidatorServiceImp implements StripePaymentInte
 
       Long sessionUserId = ApiSessionUtils.getUserId();
 
-      if (!user.getId().equals(sessionUserId)) {
-        throw new ApiException("User not found", "user not matched to login user");
-      }
+//      if (!user.getId().equals(sessionUserId)) {
+//        throw new ApiException("User not found", "user not matched to login user");
+//      }
 
-      if (!user.getId().equals(sessionUserId)) {
-        throw new ApiException("User not found", "user not matched to login user");
-      }
     }
 
 

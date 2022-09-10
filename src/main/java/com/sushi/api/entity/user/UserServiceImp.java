@@ -6,13 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserRecord;
+import com.stripe.model.Customer;
 import com.sushi.api.dto.AuthenticationResponseDTO;
 import com.sushi.api.dto.AuthenticatorDTO;
+import com.sushi.api.entity.account.Account;
+import com.sushi.api.entity.account.AccountDAO;
 import com.sushi.api.entity.address.Address;
 import com.sushi.api.entity.role.Role;
 import com.sushi.api.entity.role.UserType;
 import com.sushi.api.exception.ApiException;
 import com.sushi.api.library.firebase.FirebaseAuthService;
+import com.sushi.api.library.stripe.customer.StripeCustomerService;
 import com.sushi.api.security.AuthenticationService;
 import com.sushi.api.utils.ObjectUtils;
 import com.sushi.api.utils.RandomGeneratorUtils;
@@ -27,6 +31,12 @@ public class UserServiceImp implements UserService {
 
   @Autowired
   private AuthenticationService authenticationService;
+
+  @Autowired
+  private StripeCustomerService stripeCustomerService;
+
+  @Autowired
+  private AccountDAO accountDAO;
 
   @Autowired
   private UserDAO userDAO;
@@ -56,12 +66,16 @@ public class UserServiceImp implements UserService {
       /**
        * sign up
        */
+      
+      Account account = new Account();
+      account = accountDAO.save(account);
 
       user = new User();
       user.setUuid(userRecord.getUid());
       user.addRole(new Role(UserType.user));
       user.setAddress(new Address());
       user.setStatus(UserStatus.ACTIVE);
+      user.setAccount(account);
 
       String email = userRecord.getEmail();
 
@@ -104,6 +118,12 @@ public class UserServiceImp implements UserService {
       // user.setStripeCustomerId(customer.getId());
 
       user = userDAO.save(user);
+
+      Customer stripeCustomer = stripeCustomerService.create(user);
+
+      account.setStripeCustomerId(stripeCustomer.getId());
+
+      accountDAO.save(account);
 
       // notificationService.sendWelcomeNotificationToParent(petParent);
     }

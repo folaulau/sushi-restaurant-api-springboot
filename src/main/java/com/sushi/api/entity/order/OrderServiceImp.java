@@ -29,6 +29,7 @@ import com.sushi.api.dto.LineItemCreateDTO;
 import com.sushi.api.dto.OrderDTO;
 import com.sushi.api.dto.OrderRemoveRequestDTO;
 import com.sushi.api.dto.OrderRequestDTO;
+import com.sushi.api.entity.order.calculator.OrderCalculatorService;
 import com.sushi.api.entity.order.lineitem.LineItem;
 import com.sushi.api.entity.order.lineitem.LineItemDAO;
 import com.sushi.api.entity.payment.PaymentService;
@@ -49,6 +50,9 @@ public class OrderServiceImp implements OrderService {
 
   @Autowired
   private LineItemDAO lineItemDAO;
+  
+  @Autowired
+  private OrderCalculatorService orderCalculatorService;
 
   @Autowired
   private ProductDAO productDAO;

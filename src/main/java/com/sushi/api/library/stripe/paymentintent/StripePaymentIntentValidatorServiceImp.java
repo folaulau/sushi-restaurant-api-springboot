@@ -16,12 +16,15 @@ import com.sushi.api.dto.LineItemDTO;
 import com.sushi.api.dto.OrderRequestDTO;
 import com.sushi.api.dto.PaymentIntentCreateDTO;
 import com.sushi.api.dto.ProductUuidDTO;
+import com.sushi.api.entity.order.Order;
+import com.sushi.api.entity.order.OrderDAO;
 import com.sushi.api.entity.order.lineitem.LineItem;
 import com.sushi.api.entity.product.Product;
 import com.sushi.api.entity.product.ProductDAO;
 import com.sushi.api.entity.product.ProductName;
 import com.sushi.api.entity.user.User;
 import com.sushi.api.entity.user.UserDAO;
+import com.sushi.api.exception.ApiError;
 import com.sushi.api.exception.ApiException;
 import com.sushi.api.library.aws.secretsmanager.StripeSecrets;
 import com.sushi.api.utils.ApiSessionUtils;
@@ -38,14 +41,22 @@ public class StripePaymentIntentValidatorServiceImp implements StripePaymentInte
   private UserDAO userDAO;
 
   @Autowired
+  private OrderDAO orderDAO;
+
+  @Autowired
   @Qualifier(value = "stripeSecrets")
   private StripeSecrets stripeSecrets;
 
   @Override
-  public Triple<User, PaymentIntent, List<LineItem>> validateCreatePaymentIntent(PaymentIntentCreateDTO paymentIntentCreateDTO) {
-
+  public Triple<User, PaymentIntent, Order> validateCreatePaymentIntent(
+      PaymentIntentCreateDTO paymentIntentCreateDTO) {
 
     Stripe.apiKey = stripeSecrets.getSecretKey();
+
+    String orderUuid = paymentIntentCreateDTO.getOrderUuid();
+
+    Order order = orderDAO.findByUuid(orderUuid).orElseThrow(
+        () -> new ApiException("Order not found", "order not found for uuid=" + orderUuid));
 
     PaymentIntent paymentIntent = null;
 
@@ -69,43 +80,62 @@ public class StripePaymentIntentValidatorServiceImp implements StripePaymentInte
     User user = null;
 
     if (userUuid != null && !userUuid.isEmpty()) {
+
       user = userDAO.findByUuid(paymentIntentCreateDTO.getUserUuid()).orElseThrow(
           () -> new ApiException("User not found", "user not found for uuid=" + userUuid));
 
-      if (!user.getId().equals(ApiSessionUtils.getUserId())) {
+      Long sessionUserId = ApiSessionUtils.getUserId();
+
+      if (!user.getId().equals(sessionUserId)) {
+        throw new ApiException("User not found", "user not matched to login user");
+      }
+
+      if (!user.getId().equals(sessionUserId)) {
         throw new ApiException("User not found", "user not matched to login user");
       }
     }
 
 
+    return Triple.of(user, paymentIntent, order);
+  }
 
-    Set<LineItemDTO> lineItemDTOs = paymentIntentCreateDTO.getLineItems();
+  @Override
+  public Triple<User, PaymentIntent, Order> validateGuestCreatePaymentIntent(
+      PaymentIntentCreateDTO paymentIntentCreateDTO) {
 
-    if (lineItemDTOs == null || lineItemDTOs.isEmpty()) {
-      throw new ApiException("Empty order", "products size=" + lineItemDTOs.size());
+    Stripe.apiKey = stripeSecrets.getSecretKey();
+
+    String orderUuid = paymentIntentCreateDTO.getOrderUuid();
+
+    Order order = orderDAO.findByUuid(orderUuid).orElseThrow(
+        () -> new ApiException("Order not found", "order not found for uuid=" + orderUuid));
+
+
+    if (order.getUser() != null) {
+      throw new ApiException(ApiError.DEFAULT_MSG,
+          "unexpected user attached to order but it should be null");
     }
 
-    List<LineItem> products = new ArrayList<>();
+    PaymentIntent paymentIntent = null;
 
-    for (LineItemDTO lineItemDTO : lineItemDTOs) {
-      ProductName uuid = lineItemDTO.getProduct().getUuid();
-      
-      
-      if (uuid == null) {
-        throw new ApiException("Product not found",
-            "product not found for uuid=" + uuid);
+    String paymentIntentId = paymentIntentCreateDTO.getPaymentIntentId();
+
+    if (paymentIntentId != null && !paymentIntentId.isEmpty()) {
+      try {
+        paymentIntent = PaymentIntent.retrieve(paymentIntentId);
+        // log.info("paymentIntent={}", paymentIntent.toJson());
+      } catch (StripeException e) {
+        log.warn("StripeException - getById, msg={}, userMessage={}, stripeErrorMessage={}",
+            e.getLocalizedMessage(), e.getUserMessage(), e.getStripeError().getMessage());
+        throw new ApiException(e.getStripeError().getMessage(),
+            "Stripe error: " + e.getLocalizedMessage());
+
       }
-
-      Product product = productDAO.getByUuid(uuid)
-          .orElseThrow(() -> new ApiException("Product not found",
-              "product not found for uuid=" + uuid));
-
-
-//      products.add(product);
-
     }
+    
+    User user = null;
 
-    return Triple.of(user, paymentIntent, products);
+    return Triple.of(user, paymentIntent, order);
   }
 
 }

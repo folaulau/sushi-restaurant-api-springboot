@@ -11,6 +11,7 @@ import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import com.sushi.api.entity.order.Order;
+import com.sushi.api.entity.order.OrderCostDetails;
 import com.sushi.api.entity.order.lineitem.LineItem;
 import com.sushi.api.entity.order.paymentmethod.OrderPaymentMethod;
 import com.sushi.api.entity.paymentmethod.PaymentMethod;
@@ -31,5 +32,7 @@ public interface EntityDTOMapper {
   OrderDTO mapOrderToOrderDTO(Order order);
 
   LineItem mapLineItemCreateDTOToLineItem(LineItemCreateDTO lineItemCreateDTO);
+
+  PaymentIntentDTO mapOrderCostDetailsToPaymentIntent(OrderCostDetails orderCostDetails);
   
 }

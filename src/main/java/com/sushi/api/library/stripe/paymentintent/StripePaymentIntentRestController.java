@@ -27,9 +27,21 @@ public class StripePaymentIntentRestController {
   @Autowired
   private StripePaymentIntentService stripePaymentIntentService;
 
+  @Operation(summary = "Get Stripe Guest Payment Intent for order", description = "")
+  @PostMapping(value = "/stripe/guest/paymentintent/order")
+  public ResponseEntity<PaymentIntentDTO> createGuestOrderPaymentIntent(
+      @RequestBody PaymentIntentCreateDTO paymentIntentParentDTO) {
+    log.info("createParentPaymentIntent={}", ObjectUtils.toJson(paymentIntentParentDTO));
+
+    PaymentIntentDTO paymentIntent =
+        stripePaymentIntentService.createGuestPaymentIntent(paymentIntentParentDTO);
+
+    return new ResponseEntity<>(paymentIntent, OK);
+  }
+  
   @Operation(summary = "Get Stripe Payment Intent for order", description = "")
   @PostMapping(value = "/stripe/paymentintent/order")
-  public ResponseEntity<PaymentIntentDTO> createOrderPaymentIntentForBooking(
+  public ResponseEntity<PaymentIntentDTO> createOrderPaymentIntentForOrder(
       @RequestBody PaymentIntentCreateDTO paymentIntentParentDTO) {
     log.info("createParentPaymentIntent={}", ObjectUtils.toJson(paymentIntentParentDTO));
 

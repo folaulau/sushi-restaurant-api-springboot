@@ -10,7 +10,7 @@ public final class PathUtils {
 
   public static final String[] TEST_URLS = {"/tests/**", "/integration"};
 
-  public static final String[] PUBLIC_URLS = {"/stripe/paymentintent/order","/orders/guest/current","/orders/guest/current/remove-item"};
+  public static final String[] PUBLIC_URLS = {"/stripe/guest/paymentintent/order","/orders/guest/current","/orders/guest/current/remove-item"};
 
   public static final String[] SWAGGER_DOC_URLS = {"/v3/**", "/swagger-ui/**", "/swagger-ui.html",
       "/swagger-resources", "/swagger-resources/**", "/swagger-resources/configuration/ui",

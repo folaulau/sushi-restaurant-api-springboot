@@ -35,12 +35,16 @@ public class PaymentIntentDTO implements Serializable {
   /**
    * amount charge for order
    */
-  private Double orderCharge;
+  private Double orderCost;
+
+  private Double deliveryFee;
+
+  private Double taxFee;
 
   /**
-   * amount charge for order + stripeFee + serviceFee
+   * amount charge for order + stripeFee + serviceFee + deliveryFee
    */
-  private Double totalCharge;
+  private Double total;
 
   // for paymentMethod to use in future
   private String setupFutureUsage;

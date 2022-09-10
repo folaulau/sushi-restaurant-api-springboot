@@ -11,6 +11,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -107,6 +109,10 @@ public class Order implements Serializable {
 
   @Column(name = "current", nullable = false)
   private boolean current;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "delivery_method", nullable = true)
+  private DeliveryMethod deliveryMethod;
 
   @Column(name = "delivered_at")
   private LocalDateTime deliveredAt;
@@ -228,9 +234,9 @@ public class Order implements Serializable {
       lineItem.setDeleted(true);
       return lineItem;
     }).collect(Collectors.toSet());
-    
+
     this.lineItems.removeAll(this.lineItems);
-    
+
   }
 
   @PrePersist

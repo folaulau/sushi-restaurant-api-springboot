@@ -2,8 +2,10 @@ package com.sushi.api.dto;
 
 import java.io.Serializable;
 import java.util.Set;
+import javax.validation.constraints.NotEmpty;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.sushi.api.entity.order.DeliveryMethod;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +29,11 @@ public class PaymentIntentCreateDTO implements Serializable {
 
   private String userUuid;
 
-  private Set<LineItemDTO> lineItems;
+  private DeliveryMethod deliveryMethod;
+
+  private AddressCreateUpdateDTO address;
+
+  @NotEmpty(message = "orderUuid is required")
+  private String orderUuid;
 
 }

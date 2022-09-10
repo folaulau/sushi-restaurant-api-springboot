@@ -11,4 +11,6 @@ public interface StripePaymentIntentService {
 
   PaymentIntentDTO createPaymentIntent(PaymentIntentCreateDTO paymentIntentParentDTO);
 
+  PaymentIntentDTO createGuestPaymentIntent(PaymentIntentCreateDTO paymentIntentParentDTO);
+
 }

@@ -15,6 +15,10 @@ import com.stripe.param.EphemeralKeyCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import com.sushi.api.dto.EntityDTOMapper;
 import com.sushi.api.dto.PaymentIntentDTO;
+import com.sushi.api.entity.order.Order;
+import com.sushi.api.entity.order.OrderCostDetails;
+import com.sushi.api.entity.order.OrderValidatorService;
+import com.sushi.api.entity.order.calculator.OrderCalculatorService;
 import com.sushi.api.entity.order.lineitem.LineItem;
 import com.sushi.api.entity.product.Product;
 import com.sushi.api.entity.user.User;
@@ -43,6 +47,9 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
   @Autowired
   private EntityDTOMapper entityDTOMapper;
 
+  @Autowired
+  private OrderCalculatorService orderCalculatorService;
+
   @Override
   public PaymentIntent getById(String paymentIntentId) {
 
@@ -65,33 +72,33 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
   public PaymentIntentDTO createPaymentIntent(PaymentIntentCreateDTO paymentIntentParentDTO) {
     Stripe.apiKey = stripeSecrets.getSecretKey();
 
-    Triple<User, PaymentIntent, List<LineItem>> triple =
+    Triple<User, PaymentIntent, Order> triple =
         stripePaymentIntentValidatorService.validateCreatePaymentIntent(paymentIntentParentDTO);
 
     User user = triple.getLeft();
 
     PaymentIntent paymentIntent = triple.getMiddle();
 
-    List<LineItem> products = triple.getRight();
+    Order order = triple.getRight();
 
-    long totalChargeAsCents = BigDecimal.valueOf(123).multiply(BigDecimal.valueOf(100)).longValue();
+    OrderCostDetails orderCostDetails = orderCalculatorService.calculateOrderTotalCost(order,
+        paymentIntentParentDTO.getDeliveryMethod(), paymentIntentParentDTO.getAddress());
+
+    long totalChargeAsCents = BigDecimal.valueOf(orderCostDetails.getTotal())
+        .multiply(BigDecimal.valueOf(100)).longValue();
 
     if (paymentIntent != null) {
 
       try {
 
-        paymentIntent = PaymentIntent.retrieve(paymentIntentParentDTO.getPaymentIntentId());
-        System.out.println(paymentIntent.toJson());
-
         // @formatter:off
 
         com.stripe.param.PaymentIntentUpdateParams.Builder builder = com.stripe.param.PaymentIntentUpdateParams.builder()
                 .setAmount(totalChargeAsCents)
+                .putMetadata("orderCostDetails", orderCostDetails.toJson())
                 .putMetadata("env", env);
 
-        if (user!=null && user.getAccount().getStripeCustomerId() != null) {
-          builder.setCustomer(user.getAccount().getStripeCustomerId());
-        }
+        builder.setCustomer(user.getAccount().getStripeCustomerId());
 
         com.stripe.param.PaymentIntentUpdateParams updateParams = builder.build();
         
@@ -113,12 +120,11 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
               .setAmount(totalChargeAsCents)
               .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
               .setCurrency("usd")
+              .putMetadata("orderCostDetails", orderCostDetails.toJson())
               .putMetadata("env", env);
       //@formatter:on
 
-      if (user != null && user.getAccount().getStripeCustomerId() != null) {
-        builder.setCustomer(user.getAccount().getStripeCustomerId());
-      }
+      builder.setCustomer(user.getAccount().getStripeCustomerId());
 
       PaymentIntentCreateParams createParams = builder.build();
 
@@ -132,30 +138,96 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
 
     }
 
+    PaymentIntentDTO paymentIntentDTO =
+        entityDTOMapper.mapOrderCostDetailsToPaymentIntent(orderCostDetails);
 
+    paymentIntentDTO.setStripeCustomerId(user.getAccount().getStripeCustomerId());
 
-    PaymentIntentDTO paymentIntentDTO = new PaymentIntentDTO();
+    try {
+      com.stripe.model.EphemeralKey key = com.stripe.model.EphemeralKey.create(
+          EphemeralKeyCreateParams.builder().setCustomer(user.getAccount().getStripeCustomerId())
+              .build(),
+          RequestOptions.builder().setReadTimeout(60 * 1000)
+              .setStripeVersionOverride(Stripe.API_VERSION).build());
+      paymentIntentDTO.setEphemeralKey(key.getSecret());
 
-    if (user != null && user.getAccount().getStripeCustomerId() != null) {
-      
-      paymentIntentDTO.setStripeCustomerId(user.getAccount().getStripeCustomerId());    
-      
-      try {
-        com.stripe.model.EphemeralKey key = com.stripe.model.EphemeralKey.create(
-            EphemeralKeyCreateParams.builder().setCustomer(user.getAccount().getStripeCustomerId())
-                .build(),
-            RequestOptions.builder().setReadTimeout(60 * 1000)
-                .setStripeVersionOverride(Stripe.API_VERSION).build());
-        paymentIntentDTO.setEphemeralKey(key.getSecret());
-
-      } catch (StripeException e) {
-        log.warn("StripeException - createParentPaymentIntent EphemeralKey, msg={}",
-            e.getMessage());
-      }
-      
+    } catch (StripeException e) {
+      log.warn("StripeException - createParentPaymentIntent EphemeralKey, msg={}", e.getMessage());
     }
 
+    paymentIntentDTO.setId(paymentIntent.getId());
+    paymentIntentDTO.setClientSecret(paymentIntent.getClientSecret());
+    paymentIntentDTO.setSetupFutureUsage(paymentIntent.getSetupFutureUsage());
 
+    return paymentIntentDTO;
+  }
+
+  @Override
+  public PaymentIntentDTO createGuestPaymentIntent(PaymentIntentCreateDTO paymentIntentParentDTO) {
+    Triple<User, PaymentIntent, Order> triple = stripePaymentIntentValidatorService
+        .validateGuestCreatePaymentIntent(paymentIntentParentDTO);
+
+    PaymentIntent paymentIntent = triple.getMiddle();
+
+    Order order = triple.getRight();
+
+    OrderCostDetails orderCostDetails = orderCalculatorService.calculateOrderTotalCost(order,
+        paymentIntentParentDTO.getDeliveryMethod(), paymentIntentParentDTO.getAddress());
+
+    long totalChargeAsCents = BigDecimal.valueOf(orderCostDetails.getTotal())
+        .multiply(BigDecimal.valueOf(100)).longValue();
+
+    if (paymentIntent != null) {
+
+      try {
+
+        // @formatter:off
+
+        com.stripe.param.PaymentIntentUpdateParams.Builder builder = com.stripe.param.PaymentIntentUpdateParams.builder()
+                .setAmount(totalChargeAsCents)
+                .putMetadata("orderCostDetails", orderCostDetails.toJson())
+                .putMetadata("env", env);
+
+
+        com.stripe.param.PaymentIntentUpdateParams updateParams = builder.build();
+        
+        // @formatter:on
+
+        paymentIntent = paymentIntent.update(updateParams);
+
+        System.out.println("updateParentPaymentIntent paymentIntent=" + paymentIntent.toJson());
+      } catch (StripeException e) {
+        log.warn("StripeException - updateParentPaymentIntent, msg={}", e.getMessage());
+        throw new ApiException(e.getMessage(), "StripeException, msg=" + e.getMessage());
+      }
+
+
+    } else {
+      //@formatter:off
+      com.stripe.param.PaymentIntentCreateParams.Builder builder = PaymentIntentCreateParams.builder()
+              .addPaymentMethodType("card")
+              .setAmount(totalChargeAsCents)
+              .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
+              .setCurrency("usd")
+              .putMetadata("orderCostDetails", orderCostDetails.toJson())
+              .putMetadata("env", env);
+      //@formatter:on
+
+
+      PaymentIntentCreateParams createParams = builder.build();
+
+      try {
+        paymentIntent = PaymentIntent.create(createParams);
+        System.out.println("createParentPaymentIntent paymentIntent=" + paymentIntent.toJson());
+      } catch (StripeException e) {
+        log.warn("StripeException - createParentPaymentIntent, msg={}", e.getMessage());
+        throw new ApiException(e.getMessage(), "StripeException, msg=" + e.getMessage());
+      }
+
+    }
+
+    PaymentIntentDTO paymentIntentDTO =
+        entityDTOMapper.mapOrderCostDetailsToPaymentIntent(orderCostDetails);
     paymentIntentDTO.setId(paymentIntent.getId());
     paymentIntentDTO.setClientSecret(paymentIntent.getClientSecret());
     paymentIntentDTO.setSetupFutureUsage(paymentIntent.getSetupFutureUsage());

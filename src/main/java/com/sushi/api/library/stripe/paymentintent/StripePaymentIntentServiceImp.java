@@ -82,7 +82,7 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
     Order order = triple.getRight();
 
     OrderCostDetails orderCostDetails = orderCalculatorService.calculateOrderTotalCost(order,
-        paymentIntentParentDTO.getDeliveryMethod(), paymentIntentParentDTO.getAddress());
+        paymentIntentParentDTO.getDeliveryMethod(), paymentIntentParentDTO.getDeliveryAddress());
 
     long totalChargeAsCents = BigDecimal.valueOf(orderCostDetails.getTotal())
         .multiply(BigDecimal.valueOf(100)).longValue();
@@ -172,7 +172,7 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
     Order order = triple.getRight();
 
     OrderCostDetails orderCostDetails = orderCalculatorService.calculateOrderTotalCost(order,
-        paymentIntentParentDTO.getDeliveryMethod(), paymentIntentParentDTO.getAddress());
+        paymentIntentParentDTO.getDeliveryMethod(), paymentIntentParentDTO.getDeliveryAddress());
 
     long totalChargeAsCents = BigDecimal.valueOf(orderCostDetails.getTotal())
         .multiply(BigDecimal.valueOf(100)).longValue();

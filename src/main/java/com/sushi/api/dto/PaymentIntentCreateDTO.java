@@ -31,7 +31,7 @@ public class PaymentIntentCreateDTO implements Serializable {
 
   private DeliveryMethod deliveryMethod;
 
-  private AddressCreateUpdateDTO address;
+  private AddressCreateUpdateDTO deliveryAddress;
 
   @NotEmpty(message = "orderUuid is required")
   private String orderUuid;

@@ -1,6 +1,7 @@
 package com.sushi.api.entity.order;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
@@ -52,6 +53,7 @@ import com.sushi.api.dto.ProductUuidDTO;
 import com.sushi.api.entity.DatabaseTableNames;
 import com.sushi.api.entity.address.Address;
 import com.sushi.api.entity.order.lineitem.LineItem;
+import com.sushi.api.entity.order.paymentmethod.OrderPaymentMethod;
 import com.sushi.api.entity.payment.Payment;
 import com.sushi.api.entity.product.Product;
 import com.sushi.api.entity.user.User;
@@ -129,6 +131,45 @@ public class Order implements Serializable {
   @Column(name = "paid_at")
   private LocalDateTime paidAt;
 
+  /**
+   * cost of order(all products)<br>
+   * total from Order
+   */
+  @Column(name = "lineitems_total", nullable = true)
+  private Double lineItemsTotal;
+
+  /**
+   * Service fee, $2
+   */
+  @Column(name = "service_fee", nullable = true)
+  private Double serviceFee;
+
+  @Column(name = "delivery_fee", nullable = true)
+  private Double deliveryFee;
+
+  /**
+   * stripe fee on charge<br>
+   * 2.9% of orderCost<br>
+   */
+  @Column(name = "stripe_fee", nullable = true)
+  private Double stripeFee;
+
+
+  @Column(name = "tax_fee", nullable = true)
+  private Double taxFee;
+
+  /**
+   * distance to dropoff in miles
+   */
+  @Column(name = "drop_off_distance", nullable = true)
+  private Double dropOffDistance;
+
+  /**
+   * total charge for everything = orderCost + serviceFee + stripeFee
+   */
+  @Column(name = "total", nullable = true)
+  private Double total;
+
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
@@ -137,28 +178,23 @@ public class Order implements Serializable {
   @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
 
-  @Column(name = "total")
-  private Double total;
-
-  public double getTotal() {
-    this.total = 0.0;
+  public double getLineItemsTotal() {
+    this.lineItemsTotal = 0.0;
     if (this.lineItems != null && this.lineItems.size() > 0) {
-      this.lineItems.forEach((lineItem) -> {
+
+      for (LineItem lineItem : lineItems) {
         if (lineItem != null) {
-          this.total += lineItem.getTotal();
+          this.lineItemsTotal += lineItem.getTotal();
         }
-      });
-      this.total = MathUtils.getTwoDecimalPlaces(this.total);
+      }
+
+      this.lineItemsTotal = MathUtils.getTwoDecimalPlaces(total);
+
     }
-    return this.total;
+    return this.lineItemsTotal;
   }
 
-
-  public void stampPayment(Payment payment) {
-    this.payment = payment;
-    this.paid = payment.getPaid();
-    this.paidAt = LocalDateTime.now();
-  }
+  public void setLineItemsTotal(Double lineItemsTotal) {}
 
   public void addLineItem(LineItem lineItem) {
     if (this.lineItems == null) {
@@ -189,6 +225,32 @@ public class Order implements Serializable {
     return this.lineItems.stream().filter(pro -> {
       return pro.getProduct().getUuid().equals(product.getUuid());
     }).findFirst().orElse(null);
+  }
+  
+  public Double generateTotal() {
+    BigDecimal orderTotal = BigDecimal.valueOf(0.0);
+
+    orderTotal = orderTotal.add(BigDecimal.valueOf(lineItemsTotal));
+
+    if (serviceFee != null) {
+      orderTotal = orderTotal.add(BigDecimal.valueOf(serviceFee));
+    }
+
+    if (deliveryFee != null) {
+      orderTotal = orderTotal.add(BigDecimal.valueOf(deliveryFee));
+    }
+
+    if (stripeFee != null) {
+      orderTotal = orderTotal.add(BigDecimal.valueOf(stripeFee));
+    }
+
+    if (taxFee != null) {
+      orderTotal = orderTotal.add(BigDecimal.valueOf(taxFee));
+    }
+
+    this.total = orderTotal.doubleValue();
+
+    return MathUtils.getTwoDecimalPlaces(this.total);
   }
 
 
@@ -246,8 +308,12 @@ public class Order implements Serializable {
     if (this.uuid == null || this.uuid.isEmpty()) {
       this.uuid = "order-" + UUID.randomUUID().toString();
     }
+    
+    generateTotal();
   }
 
   @PreUpdate
-  private void preUpdate() {}
+  private void preUpdate() {
+    generateTotal();
+  }
 }

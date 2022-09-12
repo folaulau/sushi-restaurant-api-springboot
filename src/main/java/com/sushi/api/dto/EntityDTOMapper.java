@@ -10,6 +10,7 @@ import org.mapstruct.Mappings;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValueMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import com.sushi.api.entity.address.Address;
 import com.sushi.api.entity.order.Order;
 import com.sushi.api.entity.order.OrderCostDetails;
 import com.sushi.api.entity.order.lineitem.LineItem;
@@ -34,5 +35,11 @@ public interface EntityDTOMapper {
   LineItem mapLineItemCreateDTOToLineItem(LineItemCreateDTO lineItemCreateDTO);
 
   PaymentIntentDTO mapOrderCostDetailsToPaymentIntent(OrderCostDetails orderCostDetails);
-  
+
+  @Mappings({@Mapping(target = "uuid", ignore = true)})
+  Address patchAddressWithAddressCreateUpdateDTO(AddressCreateUpdateDTO deliveryAddress,
+      @MappingTarget Address address);
+
+  Order patchOrderWithCostDetails(OrderCostDetails orderCostDetails, @MappingTarget Order order);
+
 }

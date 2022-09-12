@@ -41,6 +41,8 @@ public class PaymentIntentDTO implements Serializable {
 
   private Double taxFee;
 
+  private Double dropOffDistance;
+
   /**
    * amount charge for order + stripeFee + serviceFee + deliveryFee
    */

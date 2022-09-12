@@ -10,4 +10,9 @@ public class PaymentDAOImp implements PaymentDAO {
 
   @Autowired
   private PaymentRepository paymentRepository;
+
+  @Override
+  public Payment save(Payment payment) {
+    return paymentRepository.saveAndFlush(payment);
+  }
 }

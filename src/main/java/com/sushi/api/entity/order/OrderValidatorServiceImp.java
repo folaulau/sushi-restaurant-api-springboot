@@ -11,8 +11,10 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import com.stripe.model.PaymentIntent;
 import com.sushi.api.dto.LineItemCreateDTO;
 import com.sushi.api.dto.LineItemDTO;
+import com.sushi.api.dto.OrderConfirmDTO;
 import com.sushi.api.dto.OrderRemoveRequestDTO;
 import com.sushi.api.dto.OrderRequestDTO;
 import com.sushi.api.dto.ProductUuidDTO;
@@ -22,6 +24,7 @@ import com.sushi.api.entity.product.ProductName;
 import com.sushi.api.entity.user.User;
 import com.sushi.api.entity.user.UserDAO;
 import com.sushi.api.exception.ApiException;
+import com.sushi.api.library.stripe.paymentintent.StripePaymentIntentService;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -37,6 +40,9 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
   @Autowired
   private LineItemDAO lineItemDAO;
 
+
+  @Autowired
+  private StripePaymentIntentService stripePaymentIntentService;
 
   @Override
   public Triple<Order, User, LineItemCreateDTO> validateCreateUpdate(
@@ -55,7 +61,7 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
     if (optOrder.isPresent()) {
       order = optOrder.get();
 
-      if (user != null  && order.getUser()!=null && !order.getUser().equals(user)) {
+      if (user != null && order.getUser() != null && !order.getUser().equals(user)) {
         throw new ApiException("Wrong Order", "order does not belong to userUuid=" + userUuid);
       }
 
@@ -116,10 +122,10 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
     Order order = orderDAO.findByUuid(uuid)
         .orElseThrow(() -> new ApiException("Order not found", "order not found for uuid=" + uuid));
 
-    if (user != null && order.getUser()!=null && !order.getUser().equals(user)) {
+    if (user != null && order.getUser() != null && !order.getUser().equals(user)) {
       throw new ApiException("Wrong Order", "order does not belong to userUuid=" + userUuid);
     }
-    
+
     order.setUser(user);
 
     LineItem lineItem = null;
@@ -140,11 +146,32 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
       if (!lineItem.getOrder().equals(order)) {
         throw new ApiException("Wrong Order", "lineItem does not belong to order=" + uuid);
       }
-    }else {
+    } else {
       lineItem = new LineItem();
     }
 
     return Pair.of(order, lineItem);
+  }
+
+
+  @Override
+  public Pair<Order, PaymentIntent> validatePayment(OrderConfirmDTO orderConfirmDTO) {
+
+
+    Order order = orderDAO.findByUuid(orderConfirmDTO.getUuid())
+        .orElseThrow(() -> new ApiException("Order not found",
+            "order not found for uuid=" + orderConfirmDTO.getUuid()));
+
+    PaymentIntent paymentIntent =
+        stripePaymentIntentService.getById(orderConfirmDTO.getPaymentIntentId());
+
+    if (!paymentIntent.getStatus().equalsIgnoreCase("succeeded")) {
+      if (paymentIntent.getStatus().equalsIgnoreCase("requires_payment_method")) {
+        throw new ApiException("You need to make a payment", "order has not been paid for");
+      }
+    }
+
+    return Pair.of(order, paymentIntent);
   }
 
 

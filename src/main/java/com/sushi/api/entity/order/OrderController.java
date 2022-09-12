@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.sushi.api.dto.OrderConfirmDTO;
 import com.sushi.api.dto.OrderDTO;
 import com.sushi.api.dto.OrderRemoveRequestDTO;
 import com.sushi.api.dto.OrderRequestDTO;
@@ -61,6 +62,20 @@ public class OrderController {
     log.debug("remove({})", orderRemoveRequestDTO.toString());
 
     OrderDTO orderDTO = orderService.remove(orderRemoveRequestDTO);
+
+    return new ResponseEntity<>(orderDTO, HttpStatus.OK);
+  }
+  
+  /**
+   * Payment has been made in the frontend, verify and update order details
+   */
+  @Operation(summary = "Confirm Payment", description = "Confirm payment")
+  @PutMapping("/guest/confirm-payment")
+  public ResponseEntity<OrderDTO> confirmQuestPayment(@Parameter(name = "OrderConfirm", required = true,
+      example = "order confirmatioin") @Valid @RequestBody OrderConfirmDTO orderConfirmDTO ) {
+    log.debug("confirmQuestPayment({})", orderConfirmDTO.toString());
+
+    OrderDTO orderDTO = orderService.confirmGuestPayment(orderConfirmDTO);
 
     return new ResponseEntity<>(orderDTO, HttpStatus.OK);
   }

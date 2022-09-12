@@ -1,6 +1,7 @@
 package com.sushi.api.entity.order;
 
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -24,14 +25,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import com.stripe.model.PaymentIntent;
 import com.sushi.api.dto.EntityDTOMapper;
 import com.sushi.api.dto.LineItemCreateDTO;
+import com.sushi.api.dto.OrderConfirmDTO;
 import com.sushi.api.dto.OrderDTO;
 import com.sushi.api.dto.OrderRemoveRequestDTO;
 import com.sushi.api.dto.OrderRequestDTO;
 import com.sushi.api.entity.order.calculator.OrderCalculatorService;
 import com.sushi.api.entity.order.lineitem.LineItem;
 import com.sushi.api.entity.order.lineitem.LineItemDAO;
+import com.sushi.api.entity.payment.Payment;
 import com.sushi.api.entity.payment.PaymentService;
 import com.sushi.api.entity.product.Product;
 import com.sushi.api.entity.product.ProductDAO;
@@ -50,7 +54,7 @@ public class OrderServiceImp implements OrderService {
 
   @Autowired
   private LineItemDAO lineItemDAO;
-  
+
   @Autowired
   private OrderCalculatorService orderCalculatorService;
 
@@ -66,7 +70,7 @@ public class OrderServiceImp implements OrderService {
   @Autowired
   private OrderValidatorService orderValidatorService;
 
-  
+
   /**
    * Increase or Decrease LineItem count
    */
@@ -102,7 +106,7 @@ public class OrderServiceImp implements OrderService {
     lineItem.setCount(lineItemCreateDTO.getCount());
     order.addLineItem(lineItem);
     lineItem.setOrder(order);
-    
+
     order.setUser(user);
 
 
@@ -140,7 +144,7 @@ public class OrderServiceImp implements OrderService {
   public OrderDTO remove(OrderRemoveRequestDTO orderRemoveRequestDTO) {
 
     log.info("remove={}", ObjectUtils.toJson(orderRemoveRequestDTO));
-    
+
     Pair<Order, LineItem> pair = orderValidatorService.validateRemoval(orderRemoveRequestDTO);
 
     Order order = pair.getFirst();
@@ -155,6 +159,27 @@ public class OrderServiceImp implements OrderService {
       order.removeLineItem(lineItem);
     }
 
+    order = orderDAO.save(order);
+
+    return entityDTOMapper.mapOrderToOrderDTO(order);
+  }
+
+  @Override
+  public OrderDTO confirmGuestPayment(OrderConfirmDTO orderConfirmDTO) {
+
+    Pair<Order, PaymentIntent> pair = orderValidatorService.validatePayment(orderConfirmDTO);
+
+    Order order = pair.getFirst();
+
+    PaymentIntent paymentIntent = pair.getSecond();
+
+    order.setPaid(paymentIntent.getStatus().equals("succeeded"));
+    order.setPaidAt(LocalDateTime.now());
+
+    Payment payment = paymentService.addOrderPayment(order, paymentIntent);
+    
+    order.setPayment(payment);
+    
     order = orderDAO.save(order);
 
     return entityDTOMapper.mapOrderToOrderDTO(order);

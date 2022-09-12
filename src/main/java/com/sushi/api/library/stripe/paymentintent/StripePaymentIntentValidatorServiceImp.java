@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
+import com.sushi.api.dto.AddressCreateUpdateDTO;
 import com.sushi.api.dto.LineItemDTO;
 import com.sushi.api.dto.OrderRequestDTO;
 import com.sushi.api.dto.PaymentIntentCreateDTO;
 import com.sushi.api.dto.ProductUuidDTO;
+import com.sushi.api.entity.order.DeliveryMethod;
 import com.sushi.api.entity.order.Order;
 import com.sushi.api.entity.order.OrderDAO;
 import com.sushi.api.entity.order.lineitem.LineItem;
@@ -86,9 +88,9 @@ public class StripePaymentIntentValidatorServiceImp implements StripePaymentInte
 
       Long sessionUserId = ApiSessionUtils.getUserId();
 
-//      if (!user.getId().equals(sessionUserId)) {
-//        throw new ApiException("User not found", "user not matched to login user");
-//      }
+      // if (!user.getId().equals(sessionUserId)) {
+      // throw new ApiException("User not found", "user not matched to login user");
+      // }
 
     }
 
@@ -101,6 +103,35 @@ public class StripePaymentIntentValidatorServiceImp implements StripePaymentInte
       PaymentIntentCreateDTO paymentIntentCreateDTO) {
 
     Stripe.apiKey = stripeSecrets.getSecretKey();
+
+    if (paymentIntentCreateDTO.getDeliveryMethod().equals(DeliveryMethod.DROP_OFF)) {
+      AddressCreateUpdateDTO deliveryAddress = paymentIntentCreateDTO.getDeliveryAddress();
+
+      if (deliveryAddress == null) {
+
+        throw new ApiException("Delivery Address is required",
+            "Delivery Address is required for delivery");
+
+      }
+
+      if (deliveryAddress.getLongitude() == null || deliveryAddress.getLatitude() == null) {
+        throw new ApiException("Delivery Address Longitude/Latitude is required",
+            "Delivery Address Longitude/Latitude  is required for delivery",
+            "Longitude/Latitude is null");
+      }
+
+      /**
+       * https://www.geographyrealm.com/zero-degrees-latitude-and-zero-degrees-longitude/
+       * There's no way lat or lon 0 is valid for any US address
+       */
+      if (deliveryAddress.getLongitude() == 0 || deliveryAddress.getLatitude() == 0) {
+        throw new ApiException("Delivery Address Longitude/Latitude is required",
+            "Delivery Address Longitude/Latitude  is required for delivery",
+            "Longitude/Latitude is 0");
+      }
+    }
+
+
 
     String orderUuid = paymentIntentCreateDTO.getOrderUuid();
 
@@ -129,7 +160,7 @@ public class StripePaymentIntentValidatorServiceImp implements StripePaymentInte
 
       }
     }
-    
+
     User user = null;
 
     return Triple.of(user, paymentIntent, order);

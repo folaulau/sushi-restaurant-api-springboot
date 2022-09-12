@@ -15,8 +15,11 @@ import com.stripe.param.EphemeralKeyCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import com.sushi.api.dto.EntityDTOMapper;
 import com.sushi.api.dto.PaymentIntentDTO;
+import com.sushi.api.entity.address.Address;
+import com.sushi.api.entity.order.DeliveryMethod;
 import com.sushi.api.entity.order.Order;
 import com.sushi.api.entity.order.OrderCostDetails;
+import com.sushi.api.entity.order.OrderDAO;
 import com.sushi.api.entity.order.OrderValidatorService;
 import com.sushi.api.entity.order.calculator.OrderCalculatorService;
 import com.sushi.api.entity.order.lineitem.LineItem;
@@ -49,6 +52,9 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
 
   @Autowired
   private OrderCalculatorService orderCalculatorService;
+
+  @Autowired
+  private OrderDAO orderDAO;
 
   @Override
   public PaymentIntent getById(String paymentIntentId) {
@@ -225,6 +231,24 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
       }
 
     }
+
+    order.setDeliveryMethod(paymentIntentParentDTO.getDeliveryMethod());
+    
+    order = entityDTOMapper.patchOrderWithCostDetails(orderCostDetails,order);
+
+    if (paymentIntentParentDTO.getDeliveryMethod().equals(DeliveryMethod.DROP_OFF)) {
+      
+      Address address = order.getAddress()!=null ? order.getAddress() : new Address();
+
+      address = entityDTOMapper.patchAddressWithAddressCreateUpdateDTO(paymentIntentParentDTO.getDeliveryAddress(),
+          address
+          );
+      
+      order.setAddress(address);
+
+    }
+
+    order = orderDAO.save(order);
 
     PaymentIntentDTO paymentIntentDTO =
         entityDTOMapper.mapOrderCostDetailsToPaymentIntent(orderCostDetails);

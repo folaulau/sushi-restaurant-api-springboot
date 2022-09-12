@@ -3,6 +3,8 @@ package com.sushi.api.entity.order;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import javax.persistence.Embeddable;
+import javax.persistence.Transient;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,9 +26,10 @@ public class OrderCostDetails implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /**
-   * cost of order(all products)
+   * cost of order(all products)<br>
+   * total from Order
    */
-  private Double orderCost;
+  private Double lineItemsTotal;
 
   /**
    * Service fee, $2
@@ -42,6 +45,11 @@ public class OrderCostDetails implements Serializable {
   private Double stripeFee;
 
   private Double taxFee;
+
+  /**
+   * distance to dropoff in miles
+   */
+  private Double dropOffDistance;
 
   /**
    * total charge for everything = orderCost + serviceFee + stripeFee
@@ -61,7 +69,7 @@ public class OrderCostDetails implements Serializable {
   public Double getTotal() {
     BigDecimal orderTotal = BigDecimal.valueOf(0.0);
 
-    orderTotal = orderTotal.add(BigDecimal.valueOf(orderCost));
+    orderTotal = orderTotal.add(BigDecimal.valueOf(lineItemsTotal));
 
     if (serviceFee != null) {
       orderTotal = orderTotal.add(BigDecimal.valueOf(serviceFee));

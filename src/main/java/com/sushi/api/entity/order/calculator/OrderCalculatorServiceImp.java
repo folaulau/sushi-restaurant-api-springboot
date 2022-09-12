@@ -18,8 +18,17 @@ public class OrderCalculatorServiceImp implements OrderCalculatorService {
   @Value("${spring.profiles.active}")
   private String env;
 
+  /**
+   * $2 per order
+   */
   @Value("${service.fee:2}")
   private Double serviceFee;
+
+  /**
+   * $1.50 per mile
+   */
+  @Value("${service.fee:1.25}")
+  private Double deliveryPerMileFee;
 
   @Override
   public OrderCostDetails calculateOrderTotalCost(Order order, DeliveryMethod deliveryMethod,
@@ -27,26 +36,53 @@ public class OrderCalculatorServiceImp implements OrderCalculatorService {
 
     OrderCostDetails orderCostDetails = new OrderCostDetails();
 
-    orderCostDetails.setOrderCost(MathUtils.getTwoDecimalPlaces(order.getTotal()));
+    double lineItemsTotal = MathUtils.getTwoDecimalPlaces(order.getLineItemsTotal());
+
+    orderCostDetails.setLineItemsTotal(lineItemsTotal);
 
     double stripeFee = BigDecimal.valueOf(2.9).divide(BigDecimal.valueOf(100))
-        .multiply(BigDecimal.valueOf(order.getTotal())).add(BigDecimal.valueOf(0.3))
+        .multiply(BigDecimal.valueOf(lineItemsTotal)).add(BigDecimal.valueOf(0.3))
         .setScale(2, RoundingMode.HALF_UP).doubleValue();
 
-//    orderCostDetails.setStripeFee(stripeFee);
+    orderCostDetails.setStripeFee(stripeFee);
+
+    /**
+     * McDonald's at Traverse Mountain as my Sushi location<br>
+     * 3550 Digital Dr, Lehi, UT 84043<br>
+     * latitude = 40.432290<br>
+     * longitude = -111.886480
+     */
+
+    double latitude = 40.432290;
+    double longitude = -111.886480;
+
+    double deliveryFee = 0.0;
+    Double dropOffDistance = 0.0;
+
+
+    if (deliveryMethod.equals(DeliveryMethod.DROP_OFF)) {
+      dropOffDistance =
+          MathUtils.distance(latitude, address.getLatitude(), longitude, address.getLongitude());
+    }
+
+    if (dropOffDistance != null) {
+      deliveryFee = deliveryPerMileFee * dropOffDistance;
+    }
+
+    orderCostDetails.setDropOffDistance(dropOffDistance);
 
     // calculate this
-    orderCostDetails.setDeliveryFee(0.0);
+    orderCostDetails.setDeliveryFee(deliveryFee);
 
     // 6.10% utah tax
 
     double taxFee = BigDecimal.valueOf(6.10).divide(BigDecimal.valueOf(100))
-        .multiply(BigDecimal.valueOf(order.getTotal())).doubleValue();
+        .multiply(BigDecimal.valueOf(lineItemsTotal)).doubleValue();
 
     orderCostDetails.setTaxFee(MathUtils.getTwoDecimalPlaces(taxFee));
-    
+
     orderCostDetails.setServiceFee(MathUtils.getTwoDecimalPlaces(serviceFee + stripeFee));
-    
+
     return orderCostDetails;
   }
 

@@ -22,4 +22,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 	// order placed to order preparing
 	Page<Order> findByStatusAndPaidAtBefore(OrderStatus status, LocalDateTime paidAt, Pageable pageable);
 	
+	// order preparing and ready to deliver or pick up
+    Page<Order> findByStatusAndDeliveryMethodAndPrepStartTimeBefore(OrderStatus status, DeliveryMethod deliveryMethod, LocalDateTime prepStartTime, Pageable pageable);
+    
+    // order ready for pick up and is picked up or delivered
+    Page<Order> findByStatusAndDeliveryMethod(OrderStatus status, DeliveryMethod deliveryMethod, Pageable pageable);
+    
+    // order delivered
+    Page<Order> findByStatusAndDeliveryMethodAndDeliverStartTimeBefore(OrderStatus status, DeliveryMethod deliveryMethod, LocalDateTime deliveryStartTime, Pageable pageable);
+	
 }

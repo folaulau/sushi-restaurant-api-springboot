@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 import com.sushi.api.entity.order.Order;
 import com.sushi.api.entity.order.OrderDAO;
 import com.sushi.api.entity.order.OrderRepository;
+import com.sushi.api.entity.order.OrderService;
 import com.sushi.api.entity.order.OrderStatus;
+import com.sushi.api.utils.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -21,6 +23,9 @@ public class OrderPrepJob {
 
   @Autowired
   private OrderRepository orderRepository;
+  
+  @Autowired
+  private OrderService orderService;
 
   /*
    * every minute check for Orders that have been placed to start preping
@@ -32,19 +37,21 @@ public class OrderPrepJob {
     int pageNumber = 0;
     int pageSize = 20;
     Pageable page = PageRequest.of(pageNumber, pageSize);
+    Page<Order> result = null;
 
-    Page<Order> result = orderRepository.findByStatusAndPaidAtBefore(OrderStatus.ORDER_PLACED,
-        LocalDateTime.now(), page);
+    while (true) {
 
-    while (result != null && result.hasContent()) {
+      result = orderRepository.findByStatusAndPaidAtBefore(OrderStatus.ORDER_PLACED,
+          LocalDateTime.now(), page);
 
       List<Order> orders = result.getContent();
 
-      orders.stream().map(order -> {
-        order.setStatus(OrderStatus.PREPARING_ORDER);
-        orderRepository.saveAndFlush(order);
-        return order;
-      }).collect(Collectors.toList());
+      orders.stream().forEach(order -> {
+        
+        order = orderService.prepareOrder(order);
+        
+        log.info("order={}",order.toJson());
+      });
 
       if (result.hasNext()) {
         ++pageNumber;
@@ -52,9 +59,6 @@ public class OrderPrepJob {
       } else {
         break;
       }
-
-      result = orderRepository.findByStatusAndPaidAtBefore(OrderStatus.ORDER_PLACED,
-          LocalDateTime.now(), page);
 
     }
   }

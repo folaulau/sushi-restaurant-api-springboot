@@ -9,8 +9,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import com.sushi.api.entity.order.DeliveryMethod;
 import com.sushi.api.entity.order.Order;
 import com.sushi.api.entity.order.OrderRepository;
+import com.sushi.api.entity.order.OrderService;
 import com.sushi.api.entity.order.OrderStatus;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +22,9 @@ public class OrderDeliveredJob {
 
   @Autowired
   private OrderRepository orderRepository;
-
+  
+  @Autowired
+  private OrderService orderService;
 
   /*
    * every minute check for Orders that have been placed to start preping
@@ -32,19 +36,26 @@ public class OrderDeliveredJob {
     int pageNumber = 0;
     int pageSize = 20;
     Pageable page = PageRequest.of(pageNumber, pageSize);
+    Page<Order> result = null;
 
-    Page<Order> result = orderRepository.findByStatusAndPaidAtBefore(OrderStatus.DELIVERING,
-        LocalDateTime.now(), page);
+    /**
+     * 4 minutes on average to deliver order
+     */
+    LocalDateTime deliveryTime = LocalDateTime.now().minusMinutes(4);
 
-    while (result != null && result.hasContent()) {
+    while (true) {
+
+      result = orderRepository.findByStatusAndDeliveryMethodAndDeliverStartTimeBefore(
+          OrderStatus.DELIVERING, DeliveryMethod.DROP_OFF, deliveryTime, page);
 
       List<Order> orders = result.getContent();
 
-      orders.stream().map(order -> {
-        order.setStatus(OrderStatus.DELIVERED);
-        orderRepository.saveAndFlush(order);
-        return order;
-      }).collect(Collectors.toList());
+      orders.stream().forEach(order -> {
+
+        order = orderService.markOrderAsDelivered(order);
+
+        log.info("order={}", order.toJson());
+      });
 
       if (result.hasNext()) {
         ++pageNumber;
@@ -52,9 +63,6 @@ public class OrderDeliveredJob {
       } else {
         break;
       }
-
-      result = orderRepository.findByStatusAndPaidAtBefore(OrderStatus.DELIVERING,
-          LocalDateTime.now(), page);
 
     }
   }

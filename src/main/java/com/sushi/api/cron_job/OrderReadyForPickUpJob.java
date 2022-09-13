@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.sushi.api.entity.order.DeliveryMethod;
 import com.sushi.api.entity.order.Order;
 import com.sushi.api.entity.order.OrderRepository;
+import com.sushi.api.entity.order.OrderService;
 import com.sushi.api.entity.order.OrderStatus;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +22,9 @@ public class OrderReadyForPickUpJob {
 
   @Autowired
   private OrderRepository orderRepository;
+  
+  @Autowired
+  private OrderService orderService;
 
   /*
    * every minute check for Orders that are done with preping and are ready for pick up
@@ -32,25 +36,26 @@ public class OrderReadyForPickUpJob {
     int pageNumber = 0;
     int pageSize = 20;
     Pageable page = PageRequest.of(pageNumber, pageSize);
+    Page<Order> result = null;
 
-    Page<Order> result = orderRepository.findByStatusAndPaidAtBefore(OrderStatus.PREPARING_ORDER,
-        LocalDateTime.now(), page);
+    /**
+     * 2 minutes on average to prep order
+     */
+    LocalDateTime prepTime = LocalDateTime.now().minusMinutes(2);
 
-    while (result != null && result.hasContent()) {
+    while (true) {
+
+      result = orderRepository.findByStatusAndDeliveryMethodAndPrepStartTimeBefore(
+          OrderStatus.PREPARING_ORDER, DeliveryMethod.PICK_UP, prepTime, page);
 
       List<Order> orders = result.getContent();
 
-      orders.stream().map(order -> {
-        
-//        if(order.getDeliveryMethod().equals(DeliveryMethod.DROP_OFF)) {
-//          order.setStatus(OrderStatus.DELIVERING);
-//        }else if(order.getDeliveryMethod().equals(DeliveryMethod.PICK_UP)) {
-//          order.setStatus(OrderStatus.READY_FOR_PICK_UP);
-//        }
-        order.setStatus(OrderStatus.READY_FOR_PICK_UP);
-        orderRepository.saveAndFlush(order);
-        return order;
-      }).collect(Collectors.toList());
+      orders.stream().forEach(order -> {
+
+        order = orderService.markOrderAsReadyForPickUp(order);
+
+        log.info("order={}", order.toJson());
+      });
 
       if (result.hasNext()) {
         ++pageNumber;
@@ -58,9 +63,6 @@ public class OrderReadyForPickUpJob {
       } else {
         break;
       }
-
-      result = orderRepository.findByStatusAndPaidAtBefore(OrderStatus.PREPARING_ORDER,
-          LocalDateTime.now(), page);
 
     }
   }

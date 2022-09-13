@@ -186,4 +186,86 @@ public class OrderServiceImp implements OrderService {
     return entityDTOMapper.mapOrderToOrderDTO(order);
   }
 
+  @Override
+  public Order prepareOrder(String uuid) {
+    Optional<Order> optOrder = orderDAO.findByUuid(uuid);
+
+    return prepareOrder(optOrder.orElseThrow(
+        () -> new ApiException("Order not found", "order not found for uuid=" + uuid)));
+  }
+
+  @Override
+  public Order prepareOrder(Order order) {
+    order.setStatus(OrderStatus.PREPARING_ORDER);
+    order.setPrepStartTime(LocalDateTime.now());
+    return orderDAO.save(order);
+  }
+
+
+  @Override
+  public Order markOrderAsDelivering(String uuid) {
+    Optional<Order> optOrder = orderDAO.findByUuid(uuid);
+
+    return markOrderAsDelivering(optOrder.orElseThrow(
+        () -> new ApiException("Order not found", "order not found for uuid=" + uuid)));
+  }
+
+  @Override
+  public Order markOrderAsDelivering(Order order) {
+
+    order.setPrepEndTime(LocalDateTime.now());
+    order.setStatus(OrderStatus.DELIVERING);
+    order.setDeliverStartTime(LocalDateTime.now());
+    return orderDAO.save(order);
+  }
+
+
+  @Override
+  public Order markOrderAsReadyForPickUp(String uuid) {
+    Optional<Order> optOrder = orderDAO.findByUuid(uuid);
+
+    return markOrderAsReadyForPickUp(optOrder.orElseThrow(
+        () -> new ApiException("Order not found", "order not found for uuid=" + uuid)));
+  }
+
+  @Override
+  public Order markOrderAsReadyForPickUp(Order order) {
+    order.setPrepEndTime(LocalDateTime.now());
+    order.setStatus(OrderStatus.READY_FOR_PICK_UP);
+    return orderDAO.save(order);
+  }
+
+
+  @Override
+  public Order markOrderAsPickedUp(String uuid) {
+    Optional<Order> optOrder = orderDAO.findByUuid(uuid);
+
+    return markOrderAsPickedUp(optOrder.orElseThrow(
+        () -> new ApiException("Order not found", "order not found for uuid=" + uuid)));
+  }
+
+  @Override
+  public Order markOrderAsPickedUp(Order order) {
+    order.setPickedUpAt(LocalDateTime.now());
+    order.setStatus(OrderStatus.PICKED_UP);
+    return orderDAO.save(order);
+  }
+
+
+  @Override
+  public Order markOrderAsDelivered(String uuid) {
+    Optional<Order> optOrder = orderDAO.findByUuid(uuid);
+
+    return markOrderAsDelivered(optOrder.orElseThrow(
+        () -> new ApiException("Order not found", "order not found for uuid=" + uuid)));
+  }
+
+  @Override
+  public Order markOrderAsDelivered(Order order) {
+
+    order.setDeliveredAt(LocalDateTime.now());
+    order.setStatus(OrderStatus.DELIVERED);
+    return orderDAO.save(order);
+  }
+
 }

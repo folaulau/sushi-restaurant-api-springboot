@@ -59,6 +59,7 @@ import com.sushi.api.entity.product.Product;
 import com.sushi.api.entity.product.ProductName;
 import com.sushi.api.entity.user.User;
 import com.sushi.api.utils.MathUtils;
+import com.sushi.api.utils.ObjectUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -73,9 +74,9 @@ import lombok.Setter;
 @JsonInclude(value = Include.NON_NULL)
 @DynamicUpdate
 @Entity
-@SQLDelete(sql = "UPDATE " + DatabaseTableNames.ORDER + " SET deleted = 'true' WHERE id = ?",
+@SQLDelete(sql = "UPDATE " + DatabaseTableNames.ORDER + " SET deleted = true WHERE id = ?",
     check = ResultCheckStyle.NONE)
-@Where(clause = "deleted = 'false'")
+@Where(clause = "deleted = false")
 @Table(name = DatabaseTableNames.ORDER,
     indexes = {@Index(columnList = "uuid"), @Index(columnList = "deleted")})
 public class Order implements Serializable {
@@ -117,12 +118,6 @@ public class Order implements Serializable {
   @Column(name = "delivery_method", nullable = true)
   private DeliveryMethod deliveryMethod;
 
-  @Column(name = "delivered_at")
-  private LocalDateTime deliveredAt;
-
-  @Column(name = "picked_up_at")
-  private LocalDateTime pickedUpAt;
-
   @Column(name = "deleted", nullable = false)
   private boolean deleted;
 
@@ -134,6 +129,21 @@ public class Order implements Serializable {
 
   @Column(name = "paid_at")
   private LocalDateTime paidAt;
+
+  @Column(name = "prep_start_time", nullable = true)
+  private LocalDateTime prepStartTime;
+
+  @Column(name = "prep_end_time", nullable = true)
+  private LocalDateTime prepEndTime;
+
+  @Column(name = "deliver_start_time")
+  private LocalDateTime deliverStartTime;
+
+  @Column(name = "delivered_at")
+  private LocalDateTime deliveredAt;
+
+  @Column(name = "picked_up_at")
+  private LocalDateTime pickedUpAt;
 
   /**
    * cost of order(all products)<br>
@@ -348,5 +358,13 @@ public class Order implements Serializable {
   @PreUpdate
   private void preUpdate() {
     generateTotal();
+  }
+
+  public String toJson() {
+    try {
+      return ObjectUtils.toJson(this);
+    } catch (Exception e) {
+      return "";
+    }
   }
 }

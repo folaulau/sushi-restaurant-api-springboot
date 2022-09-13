@@ -7,8 +7,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.persistence.Column;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.sushi.api.entity.address.Address;
+import com.sushi.api.entity.order.DeliveryMethod;
+import com.sushi.api.entity.order.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,9 +38,23 @@ public class OrderDTO implements Serializable {
 
   private double total;
 
+  private Double lineItemsTotal;
+
+  private Double serviceFee;
+
+  private Double deliveryFee;
+
+  private Double stripeFee;
+
+  private Double taxFee;
+
+  private Double dropOffDistance;
+
   private boolean delivered;
 
   private LocalDateTime deliveredAt;
+
+  private DeliveryMethod deliveryMethod;
 
   private LocalDateTime createdAt;
 
@@ -46,9 +64,15 @@ public class OrderDTO implements Serializable {
 
   private LocalDateTime paidAt;
 
+  private PaymentDTO payment;
+
+  private AddressDTO address;
+
+  private OrderStatus status;
+
   public void setLineItems(List<LineItemDTO> lineItems) {
     this.lineItems = lineItems;
-    
+
     Collections.sort(this.lineItems, (l1, l2) -> {
       return (int) (l1.getId() - l2.getId());
     });

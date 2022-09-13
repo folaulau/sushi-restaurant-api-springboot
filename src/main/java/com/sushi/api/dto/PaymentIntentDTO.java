@@ -35,7 +35,7 @@ public class PaymentIntentDTO implements Serializable {
   /**
    * amount charge for order
    */
-  private Double orderCost;
+  private Double lineItemsTotal;
 
   private Double deliveryFee;
 

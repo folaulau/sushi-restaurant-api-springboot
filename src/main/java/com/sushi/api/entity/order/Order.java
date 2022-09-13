@@ -56,6 +56,7 @@ import com.sushi.api.entity.order.lineitem.LineItem;
 import com.sushi.api.entity.order.paymentmethod.OrderPaymentMethod;
 import com.sushi.api.entity.payment.Payment;
 import com.sushi.api.entity.product.Product;
+import com.sushi.api.entity.product.ProductName;
 import com.sushi.api.entity.user.User;
 import com.sushi.api.utils.MathUtils;
 import lombok.AllArgsConstructor;
@@ -119,6 +120,9 @@ public class Order implements Serializable {
   @Column(name = "delivered_at")
   private LocalDateTime deliveredAt;
 
+  @Column(name = "picked_up_at")
+  private LocalDateTime pickedUpAt;
+
   @Column(name = "deleted", nullable = false)
   private boolean deleted;
 
@@ -170,6 +174,11 @@ public class Order implements Serializable {
   @Column(name = "total", nullable = true)
   private Double total;
 
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", nullable = false)
+  private OrderStatus status;
+
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
@@ -188,10 +197,8 @@ public class Order implements Serializable {
         }
       }
 
-      this.lineItemsTotal = MathUtils.getTwoDecimalPlaces(total);
-
     }
-    return this.lineItemsTotal;
+    return MathUtils.getTwoDecimalPlaces(this.lineItemsTotal);
   }
 
   public void setLineItemsTotal(Double lineItemsTotal) {}
@@ -226,7 +233,7 @@ public class Order implements Serializable {
       return pro.getProduct().getUuid().equals(product.getUuid());
     }).findFirst().orElse(null);
   }
-  
+
   public Double generateTotal() {
     BigDecimal orderTotal = BigDecimal.valueOf(0.0);
 
@@ -305,10 +312,36 @@ public class Order implements Serializable {
   private void preCreate() {
     this.current = true;
 
+    if (this.status == null) {
+      this.status = OrderStatus.ORDERING;
+    }
+
     if (this.uuid == null || this.uuid.isEmpty()) {
       this.uuid = "order-" + UUID.randomUUID().toString();
     }
-    
+
+    if (serviceFee == null) {
+      serviceFee = 0.0;
+    }
+
+    if (stripeFee == null) {
+      stripeFee = 0.0;
+    }
+
+    if (taxFee == null) {
+      taxFee = 0.0;
+    }
+
+    if (dropOffDistance == null) {
+      dropOffDistance = 0.0;
+    }
+
+
+    if (deliveryFee == null) {
+      deliveryFee = 0.0;
+    }
+
+
     generateTotal();
   }
 

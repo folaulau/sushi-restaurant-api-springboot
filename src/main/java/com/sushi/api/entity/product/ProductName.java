@@ -7,21 +7,21 @@ import lombok.ToString;
 @ToString
 public enum ProductName {
 
-  TUNA_ROLL(ProductType.SUSHI, "Tuna Roll", 12.0, "https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/rolls/tuna-roll.jpeg"), 
+  TUNA_ROLL(ProductType.SUSHI, "Tuna Roll", 10.0, "https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/rolls/tuna-roll.jpeg"), 
   SALMON_ROLL(ProductType.SUSHI, "Salmon Roll", 12.0 ,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/rolls/salmon-roll.jpeg"), 
-  YAKI_ROLL(ProductType.SUSHI, "Yaki Roll",12.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/rolls/yaki-niku-roll.jpeg"), 
-  VEGETARIAN_ROLL(ProductType.SUSHI, "Vegetarian Roll", 12.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/rolls/vegetarian-roll.jpeg"),
+  YAKI_ROLL(ProductType.SUSHI, "Yaki Roll",15.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/rolls/yaki-niku-roll.jpeg"), 
+  VEGETARIAN_ROLL(ProductType.SUSHI, "Vegetarian Roll", 14.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/rolls/vegetarian-roll.jpeg"),
 
 
-  FANTA(ProductType.DRINK, "Fanta", 12.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/drinks/fanta.jpeg"), 
-  COKE(ProductType.DRINK, "Coca Cola", 12.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/drinks/coke.jpeg"), 
-  ORANGE_JUICE(ProductType.DRINK, "Orange Juice",12.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/drinks/orange.jpeg"), 
-  HAWAIIAN_PUNCH(ProductType.DRINK, "Hawaiian Punch", 12.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/drinks/punch.jpeg"),
+  FANTA(ProductType.DRINK, "Fanta", 2.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/drinks/fanta.jpeg"), 
+  COKE(ProductType.DRINK, "Coca Cola", 3.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/drinks/coke.jpeg"), 
+  ORANGE_JUICE(ProductType.DRINK, "Orange Juice",3.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/drinks/orange.jpeg"), 
+  HAWAIIAN_PUNCH(ProductType.DRINK, "Hawaiian Punch", 2.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/drinks/punch.jpeg"),
 
-  COOKIE(ProductType.DESSERT, "Cookies", 12.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/desserts/cookies.jpeg"), 
-  CHURRO(ProductType.DESSERT, "Churros",12.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/desserts/churros.jpeg"), 
-  BROWNIE(ProductType.DESSERT, "Brownies",12.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/desserts/brownies.jpeg"), 
-  ICE_CREAM(ProductType.DESSERT, "Ice Cream", 12.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/desserts/ice-cream.jpeg");
+  COOKIE(ProductType.DESSERT, "Cookies", 1.50,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/desserts/cookies.jpeg"), 
+  CHURRO(ProductType.DESSERT, "Churros",2.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/desserts/churros.jpeg"), 
+  BROWNIE(ProductType.DESSERT, "Brownies",3.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/desserts/brownies.jpeg"), 
+  ICE_CREAM(ProductType.DESSERT, "Ice Cream", 3.0,"https://s3.us-west-2.amazonaws.com/sushi.pocsoft.com/backend-resources/menu/desserts/ice-cream.jpeg");
 
   private String title;
   private Double price;

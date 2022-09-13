@@ -9,6 +9,7 @@ import com.sushi.api.entity.order.DeliveryMethod;
 import com.sushi.api.entity.order.Order;
 import com.sushi.api.entity.order.OrderCostDetails;
 import com.sushi.api.utils.MathUtils;
+import com.sushi.api.utils.ObjectUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -81,7 +82,9 @@ public class OrderCalculatorServiceImp implements OrderCalculatorService {
 
     orderCostDetails.setTaxFee(MathUtils.getTwoDecimalPlaces(taxFee));
 
-    orderCostDetails.setServiceFee(MathUtils.getTwoDecimalPlaces(serviceFee + stripeFee));
+    orderCostDetails.setServiceFee(MathUtils.getTwoDecimalPlaces(serviceFee));
+    
+    log.info("orderCostDetails={}", ObjectUtils.toJson(orderCostDetails));
 
     return orderCostDetails;
   }

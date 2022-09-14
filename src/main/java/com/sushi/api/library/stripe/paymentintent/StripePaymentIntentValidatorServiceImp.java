@@ -88,9 +88,9 @@ public class StripePaymentIntentValidatorServiceImp implements StripePaymentInte
 
       Long sessionUserId = ApiSessionUtils.getUserId();
 
-      // if (!user.getId().equals(sessionUserId)) {
-      // throw new ApiException("User not found", "user not matched to login user");
-      // }
+      if (!user.getId().equals(sessionUserId)) {
+        throw new ApiException("User not found", "user not matched to login user");
+      }
 
     }
 
@@ -121,8 +121,8 @@ public class StripePaymentIntentValidatorServiceImp implements StripePaymentInte
       }
 
       /**
-       * https://www.geographyrealm.com/zero-degrees-latitude-and-zero-degrees-longitude/
-       * There's no way lat or lon 0 is valid for any US address
+       * https://www.geographyrealm.com/zero-degrees-latitude-and-zero-degrees-longitude/ There's no
+       * way lat or lon 0 is valid for any US address
        */
       if (deliveryAddress.getLongitude() == 0 || deliveryAddress.getLatitude() == 0) {
         throw new ApiException("Delivery Address Longitude/Latitude is required",

@@ -11,5 +11,5 @@ public interface DatabaseTableNames {
   String ORDER = "orders";
   String PAYMENT = "payments";
   String PAYMEN_METHOD = "payment_methods";
-
+  String RESERVATION = "reservations";
 }

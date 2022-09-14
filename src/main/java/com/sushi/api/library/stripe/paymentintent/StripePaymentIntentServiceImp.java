@@ -44,9 +44,6 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
   @Value("${spring.profiles.active}")
   private String env;
 
-  @Value("${booking.fee:10}")
-  private Double bookingFee;
-
   @Autowired
   private EntityDTOMapper entityDTOMapper;
 

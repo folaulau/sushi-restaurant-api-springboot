@@ -16,6 +16,7 @@ import com.sushi.api.entity.order.OrderCostDetails;
 import com.sushi.api.entity.order.lineitem.LineItem;
 import com.sushi.api.entity.order.paymentmethod.OrderPaymentMethod;
 import com.sushi.api.entity.paymentmethod.PaymentMethod;
+import com.sushi.api.entity.reservation.Reservation;
 import com.sushi.api.entity.user.User;
 
 // @formatter:off
@@ -41,5 +42,13 @@ public interface EntityDTOMapper {
       @MappingTarget Address address);
 
   Order patchOrderWithCostDetails(OrderCostDetails orderCostDetails, @MappingTarget Order order);
+
+  Reservation mapReservationCreateDTOToReservation(ReservationCreateDTO reservationCreateDTO);
+
+  ReservationDTO mapReservationToReservationDTO(Reservation reservation);
+
+  @Mappings({@Mapping(target = "uuid", ignore = true)})
+  Reservation patchReservationWithReservationUpdateDTO(ReservationUpdateDTO reservationUpdateDTO,
+      @MappingTarget Reservation reservation);
 
 }

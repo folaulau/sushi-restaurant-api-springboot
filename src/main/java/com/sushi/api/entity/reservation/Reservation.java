@@ -74,6 +74,9 @@ public class Reservation implements Serializable {
   @Column(name = "name", nullable = false)
   private String name;
 
+  /**
+   * date and time of reservation
+   */
   @Column(name = "date_time", nullable = false)
   private LocalDateTime dateTime;
 
@@ -82,6 +85,9 @@ public class Reservation implements Serializable {
 
   @Column(name = "reserved_at", nullable = true)
   private LocalDateTime reservedAt;
+
+  @Column(name = "estimated_finished_time", nullable = true)
+  private LocalDateTime estimatedFinishedTime;
 
   @Column(name = "checked_in_time", nullable = true)
   private LocalDateTime checkedInTime;

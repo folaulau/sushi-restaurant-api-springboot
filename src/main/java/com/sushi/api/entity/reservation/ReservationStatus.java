@@ -7,5 +7,5 @@ import lombok.ToString;
 @ToString
 public enum ReservationStatus {
 
-  WAITLIST, RESERVED, CHECK_IN, CHECK_OUT, NO_SHOW;
+  WAITLIST, RESERVED, CHECKED_IN, CHECKED_OUT, NO_SHOW;
 }

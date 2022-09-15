@@ -1,7 +1,9 @@
 package com.sushi.api.entity.reservation;
 
+import java.time.LocalDateTime;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.sushi.api.dto.EntityDTOMapper;
 import com.sushi.api.dto.ReservationCreateDTO;
@@ -20,6 +22,12 @@ public class ReservationServiceImp implements ReservationService {
 
   @Autowired
   private EntityDTOMapper entityDTOMapper;
+  
+  /**
+   * 2 hours
+   */
+  @Value("${reservation.estimate.duration:2}")
+  private int reservationEstimateDuration;
 
   @Autowired
   private ReservationValidatorService reservationValidatorService;
@@ -31,6 +39,14 @@ public class ReservationServiceImp implements ReservationService {
 
     Reservation reservation =
         entityDTOMapper.mapReservationCreateDTOToReservation(reservationCreateDTO);
+
+    reservation.setUser(user);
+    reservation.setStatus(ReservationStatus.RESERVED);
+    reservation.setReservedAt(LocalDateTime.now());
+    
+    LocalDateTime dateTime = reservation.getDateTime();
+    
+    reservation.setEstimatedFinishedTime(dateTime.plusHours(reservationEstimateDuration));
 
     reservation = reservationDAO.save(reservation);
 
@@ -61,6 +77,34 @@ public class ReservationServiceImp implements ReservationService {
     Reservation reservation = reservationDAO.findByUuid(uuid).orElseThrow(
         () -> new ApiException("Reservation not found", "Reservation not found for uuid=" + uuid));
     return entityDTOMapper.mapReservationToReservationDTO(reservation);
+  }
+
+  @Override
+  public Reservation checkIn(String uuid) {
+    Reservation reservation = reservationDAO.findByUuid(uuid).orElseThrow(
+        () -> new ApiException("Reservation not found", "Reservation not found for uuid=" + uuid));
+    return checkIn(reservation);
+  }
+  
+
+  @Override
+  public Reservation checkIn(Reservation reservation) {
+    reservation.setStatus(ReservationStatus.CHECKED_IN);
+    reservation.setCheckedInTime(LocalDateTime.now());
+    return reservationDAO.save(reservation);
+  }
+
+  @Override
+  public Reservation markAsNoShow(String uuid) {
+    Reservation reservation = reservationDAO.findByUuid(uuid).orElseThrow(
+        () -> new ApiException("Reservation not found", "Reservation not found for uuid=" + uuid));
+    return markAsNoShow(reservation);
+  }
+
+  @Override
+  public Reservation markAsNoShow(Reservation reservation) {
+    reservation.setStatus(ReservationStatus.NO_SHOW);
+    return reservationDAO.save(reservation);
   }
 
 

@@ -13,4 +13,12 @@ public interface ReservationService {
 
   ReservationDTO getUuid(String uuid);
 
+  Reservation checkIn(String uuid);
+  
+  Reservation checkIn(Reservation reservation);
+  
+  Reservation markAsNoShow(String uuid);
+  
+  Reservation markAsNoShow(Reservation reservation);
+
 }

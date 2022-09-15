@@ -2,6 +2,7 @@ package com.sushi.api.entity.reservation;
 
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import com.sushi.api.dto.ReservationDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,9 @@ public class ReservationDAOImp implements ReservationDAO {
 
   @Autowired
   private ReservationRepository reservationRepository;
+  
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
 
   @Override
   public Reservation save(Reservation reservation) {

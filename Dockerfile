@@ -1,7 +1,7 @@
 ########### Run #########
 FROM openjdk:17-alpine
 
-ADD target/pooch-api.jar pooch-api.jar
-EXPOSE 8085
+ADD target/sushi-api.jar sushi-api.jar
+EXPOSE 8098
 
-ENTRYPOINT ["java","-jar", "pooch-api.jar"]
+ENTRYPOINT ["java","-jar", "sushi-api.jar"]

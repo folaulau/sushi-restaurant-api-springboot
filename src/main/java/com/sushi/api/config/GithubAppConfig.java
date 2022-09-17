@@ -59,18 +59,11 @@ public class GithubAppConfig {
   @Value("${aws.access.key}")
   private String awsAccessKey;
 
-  @Value("${aws.secret.access.key}")
-  private String awsSecretAccessKey;
+  @Value("${aws.secret.key}")
+  private String awsSecretKey;
 
   @Value("${firebase.web.api.key}")
   private String firebaseWebApiKey;
-
-
-  /**
-   * from github secrets
-   */
-  @Value("${aws.secret.key}")
-  private String awsSecretkey;
 
   @Autowired
   private AwsSecretsManagerService awsSecretsManagerService;
@@ -81,9 +74,9 @@ public class GithubAppConfig {
 
   @Bean(name = "amazonAWSCredentialsProvider")
   public AWSCredentialsProvider amazonAWSCredentialsProvider() {
-    log.info("accessKey={}, secretKey={}", awsAccessKey, awsSecretAccessKey);
+    log.info("accessKey={}, secretKey={}", awsAccessKey, awsSecretKey);
     return new AWSStaticCredentialsProvider(
-        new BasicAWSCredentials(awsAccessKey, awsSecretAccessKey));
+        new BasicAWSCredentials(awsAccessKey, awsSecretKey));
 
   }
 

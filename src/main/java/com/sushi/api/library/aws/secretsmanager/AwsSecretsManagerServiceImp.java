@@ -45,7 +45,8 @@ public class AwsSecretsManagerServiceImp implements AwsSecretsManagerService {
 
   @Override
   public DatabaseSecrets getDbSecret() {
-
+    log.info("databaseSecretName={}",databaseSecretName);   
+    
     GetSecretValueRequest getSecretValueRequest = new GetSecretValueRequest();
     getSecretValueRequest.setSecretId(databaseSecretName);
 
@@ -79,6 +80,7 @@ public class AwsSecretsManagerServiceImp implements AwsSecretsManagerService {
 
   @Override
   public StripeSecrets getStripeSecrets() {
+    log.info("stripeSecretName={}",stripeSecretName); 
     GetSecretValueRequest getSecretValueRequest = new GetSecretValueRequest();
     getSecretValueRequest.setSecretId(stripeSecretName);
 
@@ -143,6 +145,7 @@ public class AwsSecretsManagerServiceImp implements AwsSecretsManagerService {
 
   @Override
   public FirebaseSecrets getFirebaseSecrets() {
+    log.info("firebaseSecretName={}",firebaseSecretName);
     GetSecretValueRequest getSecretValueRequest = new GetSecretValueRequest();
     getSecretValueRequest.setSecretId(firebaseSecretName);
 
@@ -209,6 +212,7 @@ public class AwsSecretsManagerServiceImp implements AwsSecretsManagerService {
 
   @Override
   public XApiKey getXApiKeys() {
+    log.info("xApiKeySecretName={}",xApiKeySecretName);
     GetSecretValueRequest getSecretValueRequest = new GetSecretValueRequest();
     getSecretValueRequest.setSecretId(xApiKeySecretName);
 

@@ -72,24 +72,16 @@ public class GithubAppConfig {
     return Regions.fromName(targetRegion);
   }
 
-  @Bean(name = "amazonAWSCredentialsProvider")
-  public AWSCredentialsProvider amazonAWSCredentialsProvider() {
-    log.info("accessKey={}, secretKey={}", awsAccessKey, awsSecretKey);
-    return new AWSStaticCredentialsProvider(
-        new BasicAWSCredentials(awsAccessKey, awsSecretKey));
-
-  }
-
   @Bean
-  public AmazonS3 amazonS3() {
-    return AmazonS3ClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
+  public AmazonS3 amazonS3(AWSCredentialsProvider amazonAWSCredentialsProvider) {
+    return AmazonS3ClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider)
         .withRegion(getTargetRegion()).build();
   }
 
   @Bean
-  public AmazonSimpleEmailService amazonSES() {
+  public AmazonSimpleEmailService amazonSES(AWSCredentialsProvider amazonAWSCredentialsProvider) {
     return AmazonSimpleEmailServiceClientBuilder.standard()
-        .withCredentials(amazonAWSCredentialsProvider()).withRegion(Regions.US_WEST_2).build();
+        .withCredentials(amazonAWSCredentialsProvider).withRegion(Regions.US_WEST_2).build();
   }
   
   @Bean(name = "stripeSecrets")
@@ -139,17 +131,6 @@ public class GithubAppConfig {
   public FirebaseSecrets firebaseSecrets() {
     FirebaseSecrets firebaseSecrets = awsSecretsManagerService.getFirebaseSecrets();
     return firebaseSecrets;
-  }
-
-  @Bean
-  public AWSSecretsManager awsSecretsManager() {
-    String endpoint = "secretsmanager." + getTargetRegion().getName() + ".amazonaws.com";
-    AwsClientBuilder.EndpointConfiguration config =
-        new AwsClientBuilder.EndpointConfiguration(endpoint, getTargetRegion().getName());
-    AWSSecretsManagerClientBuilder clientBuilder = AWSSecretsManagerClientBuilder.standard();
-    clientBuilder.setEndpointConfiguration(config);
-    clientBuilder.setCredentials(amazonAWSCredentialsProvider());
-    return clientBuilder.build();
   }
 
   @Bean

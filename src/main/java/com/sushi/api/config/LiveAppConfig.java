@@ -127,34 +127,6 @@ public class LiveAppConfig {
   }
 
   @Bean
-  public AWSCredentialsProvider amazonAWSCredentialsProvider() {
-    return DefaultAWSCredentialsProviderChain.getInstance();
-  }
-
-  @Bean
-  public AmazonS3 amazonS3() {
-    return AmazonS3ClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
-        .withRegion(getTargetRegion()).build();
-  }
-
-  @Bean
-  public AmazonSimpleEmailService amazonSES() {
-    return AmazonSimpleEmailServiceClientBuilder.standard()
-        .withCredentials(amazonAWSCredentialsProvider()).withRegion(getTargetRegion()).build();
-  }
-
-  @Bean
-  public AWSSecretsManager awsSecretsManager(AWSCredentialsProvider aWSCredentialsProvider) {
-    String endpoint = "secretsmanager." + getTargetRegion().getName() + ".amazonaws.com";
-    AwsClientBuilder.EndpointConfiguration config =
-        new AwsClientBuilder.EndpointConfiguration(endpoint, getTargetRegion().getName());
-    AWSSecretsManagerClientBuilder clientBuilder = AWSSecretsManagerClientBuilder.standard();
-    clientBuilder.setEndpointConfiguration(config);
-    clientBuilder.setCredentials(aWSCredentialsProvider);
-    return clientBuilder.build();
-  }
-
-  @Bean
   public FirebaseApp firebaseApp() {
     FirebaseApp firebaseApp = null;
     try {

@@ -137,8 +137,7 @@ public class GithubAppConfig {
 
   @Bean(name = "firebaseSecrets")
   public FirebaseSecrets firebaseSecrets() {
-    FirebaseSecrets firebaseSecrets = new FirebaseSecrets();
-    firebaseSecrets.setAuthWebApiKey(firebaseWebApiKey);
+    FirebaseSecrets firebaseSecrets = awsSecretsManagerService.getFirebaseSecrets();
     return firebaseSecrets;
   }
 

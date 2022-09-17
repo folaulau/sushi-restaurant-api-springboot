@@ -93,9 +93,9 @@ jobs:
 
     env:
       DEV_ECS_CLUSTER: pocsoft
-      DEV_ECS_SERVICE: sushi-api-prod
-      CONTAINER_NAME: sushi-api-prod
-      TASK_DEFINITION: sushi-api-prod
+      DEV_ECS_SERVICE: sushi-api
+      CONTAINER_NAME: sushi-api-container
+      TASK_DEFINITION: sushi-api-task
 
     # https://github.com/aws-actions/amazon-ecs-deploy-task-definition
     # https://aws.amazon.com/blogs/containers/create-a-ci-cd-pipeline-for-amazon-ecs-with-github-actions-and-aws-codebuild-tests/

@@ -110,6 +110,12 @@ public class LiveAppConfig {
   public XApiKey xApiKeySecrets() {
     return awsSecretsManagerService.getXApiKeys();
   }
+  
+  @Bean(name = "firebaseSecrets")
+  public FirebaseSecrets firebaseSecrets() {
+    FirebaseSecrets firebaseSecrets = awsSecretsManagerService.getFirebaseSecrets();
+    return firebaseSecrets;
+  }
 
 //  @Bean
 //  public SendGrid sendGrid() {
@@ -142,6 +148,8 @@ public class LiveAppConfig {
     }
 
     FirebaseSecrets firebaseSecrets = awsSecretsManagerService.getFirebaseSecrets();
+    
+    log.info("firebaseSecrets={}", firebaseSecrets.toJson());
 
     try {
           // @formatter:off

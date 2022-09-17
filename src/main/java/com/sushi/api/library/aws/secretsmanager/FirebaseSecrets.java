@@ -32,5 +32,9 @@ public class FirebaseSecrets implements Serializable {
       return null;
     }
   }
+  
+  public String toJson() {
+    return ObjectUtils.toJson(this);
+  }
 
 }

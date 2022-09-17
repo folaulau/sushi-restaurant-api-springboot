@@ -40,7 +40,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Profile(value = {"dev", "prod"})
+@Profile(value = {"prod"})
 @Configuration
 public class LiveAppConfig {
 

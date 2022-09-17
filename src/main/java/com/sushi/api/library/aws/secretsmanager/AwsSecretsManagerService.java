@@ -6,14 +6,14 @@ public interface AwsSecretsManagerService {
 
   public StripeSecrets getStripeSecrets();
 
-  public TwilioSecrets getTwilioSecrets();
+//  public TwilioSecrets getTwilioSecrets();
 
   public FirebaseSecrets getFirebaseSecrets();
 
-  public ElasticsearchSecrets getElasticsearchSecrets();
+//  public ElasticsearchSecrets getElasticsearchSecrets();
 
   public XApiKey getXApiKeys();
 
-  public SMTPSecrets getSMTPSecrets();
+//  public SMTPSecrets getSMTPSecrets();
 
 }

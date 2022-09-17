@@ -70,8 +70,8 @@ public class LiveAppConfig {
 
     HikariConfig config = new HikariConfig();
     config.setJdbcUrl(url);
-    config.setUsername(databaseSecrets.getUsername());
-    config.setPassword(databaseSecrets.getPassword());
+    config.setUsername(username);
+    config.setPassword(password);
     config.addDataSourceProperty("cachePrepStmts", "true");
     config.addDataSourceProperty("prepStmtCacheSize", "250");
     config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
@@ -96,10 +96,10 @@ public class LiveAppConfig {
     return awsSecretsManagerService.getStripeSecrets();
   }
 
-  @Bean(name = "twilioSecrets")
-  public TwilioSecrets twilioSecrets() {
-    return awsSecretsManagerService.getTwilioSecrets();
-  }
+//  @Bean(name = "twilioSecrets")
+//  public TwilioSecrets twilioSecrets() {
+//    return awsSecretsManagerService.getTwilioSecrets();
+//  }
 
   @Bean(name = "queue")
   public String queue(@Value("${queue}") String queue) {
@@ -111,12 +111,12 @@ public class LiveAppConfig {
     return awsSecretsManagerService.getXApiKeys();
   }
 
-  @Bean
-  public SendGrid sendGrid() {
-    SMTPSecrets sMTPSecrets = awsSecretsManagerService.getSMTPSecrets();
-    SendGrid sendGrid = new SendGrid(sMTPSecrets.getPassword());
-    return sendGrid;
-  }
+//  @Bean
+//  public SendGrid sendGrid() {
+//    SMTPSecrets sMTPSecrets = awsSecretsManagerService.getSMTPSecrets();
+//    SendGrid sendGrid = new SendGrid(sMTPSecrets.getPassword());
+//    return sendGrid;
+//  }
 
   /**
    * AWS

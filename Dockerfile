@@ -1,5 +1,5 @@
 ########### Run #########
-FROM openjdk:17-alpine
+FROM openjdk17:alpine-slim
 
 ADD target/sushi-api.jar sushi-api.jar
 EXPOSE 8098

@@ -10,7 +10,10 @@ import org.springframework.core.io.ClassPathResource;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.ecs.AmazonECS;
+import com.amazonaws.services.ecs.AmazonECSClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.secretsmanager.AWSSecretsManager;
@@ -53,10 +56,10 @@ public class LocalAppConfig {
 
   @Value("${firebase.key.file.location}")
   private String firebaseKeyLocation;
-  
+
   @Value("${firebase.web.api.key}")
   private String firebaseWebApiKey;
-  
+
   @Bean(name = "stripeSecrets")
   public StripeSecrets stripeSecrets(@Value("${stripe.publishable.key}") String publishableKey,
       @Value("${stripe.secret.key}") String secretKey) {
@@ -130,7 +133,7 @@ public class LocalAppConfig {
     clientBuilder.setCredentials(aWSCredentialsProvider);
     return clientBuilder.build();
   }
-  
+
 
   @Bean(name = "firebaseSecrets")
   public FirebaseSecrets firebaseSecrets() {
@@ -180,5 +183,13 @@ public class LocalAppConfig {
   @Bean
   public Firestore firestore() {
     return FirestoreClient.getFirestore();
+  }
+
+  @Bean
+  public AmazonECS amazonECS() {
+    return AmazonECSClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
+        .withEndpointConfiguration(new EndpointConfiguration(
+            "sqs." + getTargetRegion().getName() + ".amazonaws.com", getTargetRegion().getName()))
+        .build();
   }
 }

@@ -11,6 +11,8 @@ import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.ecs.AmazonECS;
+import com.amazonaws.services.ecs.AmazonECSClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.secretsmanager.AWSSecretsManager;
@@ -36,47 +38,58 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class LiveAwsConfig {
 
-    @Value("${aws.deploy.region:us-west-2}")
-    private String targetRegion;
+  @Value("${aws.deploy.region:us-west-2}")
+  private String targetRegion;
 
-    /**
-     * AWS
-     */
+  /**
+   * AWS
+   */
 
-    private Regions getTargetRegion() {
-        return Regions.fromName(targetRegion);
-    }
+  private Regions getTargetRegion() {
+    return Regions.fromName(targetRegion);
+  }
 
-    @Bean
-    public AWSCredentialsProvider amazonAWSCredentialsProvider() {
-        return DefaultAWSCredentialsProviderChain.getInstance();
-    }
+  @Bean
+  public AWSCredentialsProvider amazonAWSCredentialsProvider() {
+    return DefaultAWSCredentialsProviderChain.getInstance();
+  }
 
-    @Bean
-    public AmazonS3 amazonS3() {
-        return AmazonS3ClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider()).withRegion(getTargetRegion()).build();
-    }
+  @Bean
+  public AmazonS3 amazonS3() {
+    return AmazonS3ClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
+        .withRegion(getTargetRegion()).build();
+  }
 
-    @Bean
-    public AmazonSimpleEmailService amazonSES() {
-        return AmazonSimpleEmailServiceClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider()).withRegion(getTargetRegion()).build();
-    }
+  @Bean
+  public AmazonSimpleEmailService amazonSES() {
+    return AmazonSimpleEmailServiceClientBuilder.standard()
+        .withCredentials(amazonAWSCredentialsProvider()).withRegion(getTargetRegion()).build();
+  }
 
-    @Bean
-    public AWSSecretsManager awsSecretsManager(AWSCredentialsProvider aWSCredentialsProvider) {
-        String endpoint = "secretsmanager." + getTargetRegion().getName() + ".amazonaws.com";
-        AwsClientBuilder.EndpointConfiguration config = new AwsClientBuilder.EndpointConfiguration(endpoint, getTargetRegion().getName());
-        AWSSecretsManagerClientBuilder clientBuilder = AWSSecretsManagerClientBuilder.standard();
-        clientBuilder.setEndpointConfiguration(config);
-        clientBuilder.setCredentials(aWSCredentialsProvider);
-        return clientBuilder.build();
-    }
+  @Bean
+  public AWSSecretsManager awsSecretsManager(AWSCredentialsProvider aWSCredentialsProvider) {
+    String endpoint = "secretsmanager." + getTargetRegion().getName() + ".amazonaws.com";
+    AwsClientBuilder.EndpointConfiguration config =
+        new AwsClientBuilder.EndpointConfiguration(endpoint, getTargetRegion().getName());
+    AWSSecretsManagerClientBuilder clientBuilder = AWSSecretsManagerClientBuilder.standard();
+    clientBuilder.setEndpointConfiguration(config);
+    clientBuilder.setCredentials(aWSCredentialsProvider);
+    return clientBuilder.build();
+  }
 
-    @Bean
-    public AmazonSQS amazonSQS() {
-        return AmazonSQSClientBuilder.standard()
-                .withCredentials(amazonAWSCredentialsProvider())
-                .withEndpointConfiguration(new EndpointConfiguration("sqs." + getTargetRegion().getName() + ".amazonaws.com", getTargetRegion().getName()))
-                .build();
-    }
+  @Bean
+  public AmazonSQS amazonSQS() {
+    return AmazonSQSClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
+        .withEndpointConfiguration(new EndpointConfiguration(
+            "sqs." + getTargetRegion().getName() + ".amazonaws.com", getTargetRegion().getName()))
+        .build();
+  }
+
+  @Bean
+  public AmazonECS amazonECS() {
+    return AmazonECSClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
+        .withEndpointConfiguration(new EndpointConfiguration(
+            "sqs." + getTargetRegion().getName() + ".amazonaws.com", getTargetRegion().getName()))
+        .build();
+  }
 }

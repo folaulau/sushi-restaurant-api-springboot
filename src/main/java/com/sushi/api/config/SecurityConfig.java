@@ -87,7 +87,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // handler access denied calls
         http.exceptionHandling().accessDeniedHandler(customAcccessDeniedHandler);
         
-//        http.cors();
         // @formatter:on
     }
 

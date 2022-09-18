@@ -1,5 +1,5 @@
 ########### Run #########
-FROM openjdk:17-oracle
+FROM openjdk:17
 
 ADD target/sushi-api.jar sushi-api.jar
 EXPOSE 8098

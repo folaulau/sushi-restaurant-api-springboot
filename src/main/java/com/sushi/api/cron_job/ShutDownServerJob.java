@@ -35,13 +35,13 @@ public class ShutDownServerJob {
   public void checkForLastRestCall() {
     log.info("checkForLastRestCall {}", LocalDateTime.now());
 
-    UpdateServiceRequest updateServiceRequest = new UpdateServiceRequest();
-    
-    updateServiceRequest.setCluster("pocsoft");
-    updateServiceRequest.setDesiredCount(0);
-    updateServiceRequest.setService("sushi-api");
-
-    UpdateServiceResult result = amazonECS.updateService(updateServiceRequest);
+//    UpdateServiceRequest updateServiceRequest = new UpdateServiceRequest();
+//    
+//    updateServiceRequest.setCluster("pocsoft");
+//    updateServiceRequest.setDesiredCount(0);
+//    updateServiceRequest.setService("sushi-api");
+//
+//    UpdateServiceResult result = amazonECS.updateService(updateServiceRequest);
     
 //    log.info("result:{}", result.toString());
 

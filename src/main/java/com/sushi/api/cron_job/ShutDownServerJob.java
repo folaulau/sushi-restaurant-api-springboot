@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import com.sushi.api.entity.order.OrderService;
 import com.sushi.api.entity.order.OrderStatus;
 import lombok.extern.slf4j.Slf4j;
 
+@Profile(value ={"local","prod"})
 @Component
 @Slf4j
 public class ShutDownServerJob {

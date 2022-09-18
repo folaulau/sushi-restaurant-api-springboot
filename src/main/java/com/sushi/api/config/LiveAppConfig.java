@@ -149,7 +149,7 @@ public class LiveAppConfig {
 
     FirebaseSecrets firebaseSecrets = awsSecretsManagerService.getFirebaseSecrets();
     
-    log.info("firebaseSecrets={}", firebaseSecrets.toJson());
+//    log.info("firebaseSecrets={}", firebaseSecrets.toJson());
 
     try {
           // @formatter:off

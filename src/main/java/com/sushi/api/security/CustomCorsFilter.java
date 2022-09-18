@@ -47,6 +47,7 @@ public class CustomCorsFilter implements Filter {
         response.setHeader("Access-Control-Allow-Headers", "x-api-key, token, x-requested-with, authorization, Content-Type, Authorization, credential, X-XSRF-TOKEN");
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            log.info("preflight call");
             response.setStatus(HttpServletResponse.SC_OK);
         } else {
             chain.doFilter(req, resp);

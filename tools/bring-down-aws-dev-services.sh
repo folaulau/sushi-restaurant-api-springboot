@@ -1,23 +1,14 @@
-aws ecs update-service --cluster pooch-dev --service pooch-api-dev \
---task-definition pooch-api-dev \
+aws ecs update-service --cluster pocsoft --service sushi-api \
+--task-definition sushi-api-task \
 --desired-count 0 \
---profile pooch \
+--profile folauk110 \
 --output text \
 --no-cli-pager
 
 read -t 1 -p "taking down api server."
 
-aws ecs update-service --cluster pooch-dev --service pooch-graphql-dev \
---task-definition pooch-graphql-dev \
---desired-count 0 \
---profile pooch \
---output text \
---no-cli-pager
-
-read -t 1 -p "taking down graphql server."
-
-aws rds stop-db-instance --profile pooch \
---db-instance-identifier pooch-api-dev-db \
+aws rds stop-db-instance --profile folauk110 \
+--db-instance-identifier sushi-api-prod \
 --output text \
 --no-cli-pager
 

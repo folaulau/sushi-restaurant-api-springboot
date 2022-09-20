@@ -12,4 +12,5 @@ public interface DatabaseTableNames {
   String PAYMENT = "payments";
   String PAYMEN_METHOD = "payment_methods";
   String RESERVATION = "reservations";
+  String SERVER_ACTIVITY = "server_activities";
 }

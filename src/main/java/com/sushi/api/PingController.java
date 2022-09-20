@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.sushi.api.dto.ServerStatus;
 import com.sushi.api.utils.HttpUtils;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,32 +20,32 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * 
  * @author folaukaveinga
  */
-//@Hidden
+// @Hidden
 @Tag(name = "Ping", description = "Ping Operation")
 @RestController
 public class PingController {
 
-    private Logger log = LoggerFactory.getLogger(this.getClass());
+  private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Operation(summary = "Sign Up", description = "sign up")
-    @GetMapping(path = {"/ping", "/csrf"})
-    public ResponseEntity<String> ping(HttpServletRequest request) {
+  @Operation(summary = "Sign Up", description = "sign up")
+  @GetMapping(path = {"/ping", "/csrf"})
+  public ResponseEntity<ServerStatus> ping(HttpServletRequest request) {
 
-        log.info("ping, ip: {}", HttpUtils.getRequestIP(request));
+    log.info("ping, ip: {}", HttpUtils.getRequestIP(request));
 
-        return new ResponseEntity<>("up", HttpStatus.OK);
-    }
+    return new ResponseEntity<>(new ServerStatus("up"), HttpStatus.OK);
+  }
 
-    /**
-     * In QA and Production, this path redirects to the swagger page.
-     */
-    @Operation(summary = "Welcome", description = "welcome")
-    @GetMapping(path = {"/"})
-    public ResponseEntity<String> welcome(HttpServletRequest request) {
+  /**
+   * In QA and Production, this path redirects to the swagger page.
+   */
+  @Operation(summary = "Welcome", description = "welcome")
+  @GetMapping(path = {"/"})
+  public ResponseEntity<String> welcome(HttpServletRequest request) {
 
-        log.info("welcome, ip: {}", HttpUtils.getRequestIP(request));
+    log.info("welcome, ip: {}", HttpUtils.getRequestIP(request));
 
-        return new ResponseEntity<>("Welcome to Pooch API", HttpStatus.OK);
-    }
+    return new ResponseEntity<>("Welcome to Pooch API", HttpStatus.OK);
+  }
 
 }

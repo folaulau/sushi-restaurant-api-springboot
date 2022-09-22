@@ -67,15 +67,6 @@ public class ShutDownServerJob {
       log.info("turn off service");
       
       turnOffRDS();
-      
-      try {
-        
-        // turn off ecs 2 seconds later
-        Thread.sleep(1000 * 2);
-      } catch (InterruptedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
 
       turnOffECS();
 

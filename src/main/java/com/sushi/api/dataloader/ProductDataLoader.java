@@ -38,6 +38,7 @@ public class ProductDataLoader implements ApplicationRunner {
       long id = new Long(i + 1);
 
       Product product = new Product();
+      product.setId(id);
       product.setUuid(productName);
       product.setPrice(productName.getPrice());
       product.setTitle(productName.getTitle());

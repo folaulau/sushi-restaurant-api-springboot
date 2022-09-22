@@ -13,6 +13,8 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ecs.AmazonECS;
 import com.amazonaws.services.ecs.AmazonECSClientBuilder;
+import com.amazonaws.services.rds.AmazonRDS;
+import com.amazonaws.services.rds.AmazonRDSClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.secretsmanager.AWSSecretsManager;
@@ -88,8 +90,12 @@ public class LiveAwsConfig {
   @Bean
   public AmazonECS amazonECS() {
     return AmazonECSClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
-        .withEndpointConfiguration(new EndpointConfiguration(
-            "sqs." + getTargetRegion().getName() + ".amazonaws.com", getTargetRegion().getName()))
-        .build();
+        .withRegion(getTargetRegion()).build();
+  }
+
+  @Bean
+  public AmazonRDS amazonRDS() {
+    return AmazonRDSClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
+        .withRegion(getTargetRegion()).build();
   }
 }

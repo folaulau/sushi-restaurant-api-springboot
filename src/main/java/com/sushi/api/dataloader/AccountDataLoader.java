@@ -38,29 +38,33 @@ public class AccountDataLoader implements ApplicationRunner {
     for (int i = 1; i <= numberOfAccount; i++) {
       Account account = new Account();
       account.setId(new Long(i));
+      account.setUuid("acct-uuid-" + i);
       account = accountDAO.save(account);
-      
+
       User user = new User();
+      user.setId(new Long(i));
+      user.setUuid("user-uuid-" + i);
       user.setAccount(account);
-      
+
       String firstName = RandomGeneratorUtils.getRandomFirstname();
-      
+
       user.setFirstName(firstName);
-      
+
       String lastName = RandomGeneratorUtils.getRandomLastname();
-      
+
       user.setLastName(lastName);
-      
-      user.setEmail((firstName+lastName).toLowerCase()+"@gmail.com");
-      
+
+      user.setEmail((firstName + lastName).toLowerCase() + "@gmail.com");
+
       user.setDob(LocalDate.now().minusYears(RandomGeneratorUtils.getIntegerWithin(10, 40)));
-      
-      user.setPhoneNumber("310"+RandomGeneratorUtils.getIntegerWithin(100,999)+""+RandomGeneratorUtils.getIntegerWithin(1000,9999));
-      
+
+      user.setPhoneNumber("310" + RandomGeneratorUtils.getIntegerWithin(100, 999) + ""
+          + RandomGeneratorUtils.getIntegerWithin(1000, 9999));
+
       userDAO.save(user);
     }
-    
-    
+
+
   }
 
 }

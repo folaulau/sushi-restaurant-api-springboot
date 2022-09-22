@@ -114,6 +114,9 @@ public class SushiRestaurantApiSpringbootApplication implements CommandLineRunne
         System.out.println();
         System.out
             .println("**********************************************************************");
+        
+        serverActivityDAO
+        .saveAsync(new ServerActivity(null, "server is up", "server is up", LocalDateTime.now()));
 
       } catch (Exception e) {
         e.printStackTrace();
@@ -138,8 +141,7 @@ public class SushiRestaurantApiSpringbootApplication implements CommandLineRunne
 
     System.out.println("**********************************************************************");
 
-    serverActivityDAO
-        .saveAsync(new ServerActivity(null, "server is up", "server is up", LocalDateTime.now()));
+
   }
 
 }

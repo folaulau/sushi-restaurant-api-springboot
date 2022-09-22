@@ -19,7 +19,8 @@ public class ServerActivityDAOImp implements ServerActivityDAO {
 
   @Override
   public void saveAsync(ServerActivity serverActivity) {
-    serverActivityRepository.saveAndFlush(serverActivity);
+    ServerActivity saveServerActivity = serverActivityRepository.saveAndFlush(serverActivity);
+    log.info("saveServerActivity={}", saveServerActivity);
   }
 
   @Override

@@ -2,6 +2,7 @@ package com.sushi.api;
 
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
@@ -15,6 +16,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import com.sushi.api.entity.server_activity.ServerActivity;
+import com.sushi.api.entity.server_activity.ServerActivityDAO;
 
 @SpringBootApplication
 public class SushiRestaurantApiSpringbootApplication implements CommandLineRunner {
@@ -27,6 +30,9 @@ public class SushiRestaurantApiSpringbootApplication implements CommandLineRunne
   @Autowired
   @Qualifier(value = "taskExecutor")
   private ThreadPoolTaskExecutor taskExecutor;
+
+  @Autowired
+  private ServerActivityDAO serverActivityDAO;
 
 
   @Order(Integer.MAX_VALUE)
@@ -131,6 +137,9 @@ public class SushiRestaurantApiSpringbootApplication implements CommandLineRunne
 
 
     System.out.println("**********************************************************************");
+
+    serverActivityDAO
+        .saveAsync(new ServerActivity(null, "server is up", "server is up", LocalDateTime.now()));
   }
 
 }

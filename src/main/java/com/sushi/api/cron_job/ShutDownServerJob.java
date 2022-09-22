@@ -42,7 +42,7 @@ public class ShutDownServerJob {
   /*
    * shut down ecs server when server is inactive for 15 minutes
    */
-  @Scheduled(fixedRate = 1000 * 60 * 15)
+  @Scheduled(fixedRate = 1000 * 60 * 20)
   public void checkForLastRestCall() {
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     log.info("checkForLastRestCall {}", LocalDateTime.now());

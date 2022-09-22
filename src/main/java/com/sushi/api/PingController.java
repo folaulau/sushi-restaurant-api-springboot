@@ -1,5 +1,6 @@
 package com.sushi.api;
 
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -41,11 +42,11 @@ public class PingController {
    */
   @Operation(summary = "Welcome", description = "welcome")
   @GetMapping(path = {"/"})
-  public ResponseEntity<String> welcome(HttpServletRequest request) {
+  public ResponseEntity<Map<String, String>> welcome(HttpServletRequest request) {
 
     log.info("welcome, ip: {}", HttpUtils.getRequestIP(request));
 
-    return new ResponseEntity<>("Welcome to Pooch API", HttpStatus.OK);
+    return new ResponseEntity<>(Map.of("message", "Welcome to Pooch API"), HttpStatus.OK);
   }
 
 }

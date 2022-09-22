@@ -65,10 +65,21 @@ public class ShutDownServerJob {
 
     if (lastActivityTimestamp.isBefore(now)) {
       log.info("turn off service");
+      
+      turnOffRDS();
+      
+      try {
+        
+        // turn off ecs 2 seconds later
+        Thread.sleep(1000 * 2);
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
 
       turnOffECS();
 
-      turnOffRDS();
+      
 
     } else {
       log.info("app is being used");

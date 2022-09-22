@@ -78,14 +78,12 @@ public class ShutDownServerJob {
 
   }
 
-
-
   private void turnOffRDS() {
     try {
       StopDBInstanceRequest stopDBInstanceRequest = new StopDBInstanceRequest();
       stopDBInstanceRequest.setDBInstanceIdentifier("sushi-api-prod");
       DBInstance dbInstance = amazonRDS.stopDBInstance(stopDBInstanceRequest);
-      log.info("DBInstance:{}", dbInstance.toString());
+      log.info("DBInstance is turned off. msg:{}", dbInstance.getDBInstanceStatus());
     } catch (Exception e) {
       log.info("turnOffRDS Exception: {}", e.getLocalizedMessage());
     }

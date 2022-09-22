@@ -25,7 +25,7 @@ import com.sushi.api.entity.order.OrderStatus;
 import com.sushi.api.entity.server_activity.ServerActivityDAO;
 import lombok.extern.slf4j.Slf4j;
 
-@Profile(value = {"local", "prod"})
+@Profile(value = {"prod"})
 @Component
 @Slf4j
 public class ShutDownServerJob {

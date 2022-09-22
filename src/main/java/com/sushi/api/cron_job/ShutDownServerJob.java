@@ -51,6 +51,12 @@ public class ShutDownServerJob {
 
     log.info("lastActivityTimestamp={}", lastActivityTimestamp);
 
+    if (lastActivityTimestamp == null) {
+      return;
+    }
+
+
+
     lastActivityTimestamp = lastActivityTimestamp.plusMinutes(15);
 
     log.info("15 + lastActivityTimestamp={}", lastActivityTimestamp);
@@ -61,7 +67,7 @@ public class ShutDownServerJob {
       log.info("turn off service");
 
       turnOffECS();
-      
+
       turnOffRDS();
 
     } else {

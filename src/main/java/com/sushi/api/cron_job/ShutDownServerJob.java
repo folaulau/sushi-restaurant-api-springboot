@@ -39,72 +39,72 @@ public class ShutDownServerJob {
   @Autowired
   private ServerActivityDAO serverActivityDAO;
 
-  /*
-   * shut down ecs server when server is inactive for 15 minutes
-   */
-  @Scheduled(fixedRate = 1000 * 60 * 20)
-  public void checkForLastRestCall() {
-    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-    log.info("checkForLastRestCall {}", LocalDateTime.now());
-
-    LocalDateTime lastActivityTimestamp = serverActivityDAO.getLastActivityTimestamp();
-
-    log.info("lastActivityTimestamp={}", lastActivityTimestamp);
-
-    if (lastActivityTimestamp == null) {
-      return;
-    }
-
-
-
-    lastActivityTimestamp = lastActivityTimestamp.plusMinutes(15);
-
-    log.info("15 + lastActivityTimestamp={}", lastActivityTimestamp);
-
-    LocalDateTime now = LocalDateTime.now();
-
-    if (lastActivityTimestamp.isBefore(now)) {
-      log.info("turn off service");
-      
-      turnOffRDS();
-
-      turnOffECS();
-
-      
-
-    } else {
-      log.info("app is being used");
-    }
-
-  }
-
-  private void turnOffRDS() {
-    try {
-      StopDBInstanceRequest stopDBInstanceRequest = new StopDBInstanceRequest();
-      stopDBInstanceRequest.setDBInstanceIdentifier("sushi-api-prod");
-      DBInstance dbInstance = amazonRDS.stopDBInstance(stopDBInstanceRequest);
-      log.info("DBInstance is turned off. status:{}", dbInstance.getDBInstanceStatus());
-    } catch (Exception e) {
-      log.info("turnOffRDS Exception: {}", e.getLocalizedMessage());
-    }
-
-  }
-
-  private void turnOffECS() {
-
-    try {
-      UpdateServiceRequest updateServiceRequest = new UpdateServiceRequest();
-
-      updateServiceRequest.setCluster("pocsoft");
-      updateServiceRequest.setDesiredCount(0);
-      updateServiceRequest.setService("sushi-api");
-
-      UpdateServiceResult result = amazonECS.updateService(updateServiceRequest);
-
-      log.info("UpdateServiceResult:{}", result.toString());
-    } catch (Exception e) {
-      log.info("turnOffECS Exception: {}", e.getLocalizedMessage());
-    }
-
-  }
+//  /*
+//   * shut down ecs server when server is inactive for 15 minutes
+//   */
+//  @Scheduled(fixedRate = 1000 * 60 * 20)
+//  public void checkForLastRestCall() {
+//    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+//    log.info("checkForLastRestCall {}", LocalDateTime.now());
+//
+//    LocalDateTime lastActivityTimestamp = serverActivityDAO.getLastActivityTimestamp();
+//
+//    log.info("lastActivityTimestamp={}", lastActivityTimestamp);
+//
+//    if (lastActivityTimestamp == null) {
+//      return;
+//    }
+//
+//
+//
+//    lastActivityTimestamp = lastActivityTimestamp.plusMinutes(15);
+//
+//    log.info("15 + lastActivityTimestamp={}", lastActivityTimestamp);
+//
+//    LocalDateTime now = LocalDateTime.now();
+//
+//    if (lastActivityTimestamp.isBefore(now)) {
+//      log.info("turn off service");
+//      
+//      turnOffRDS();
+//
+//      turnOffECS();
+//
+//      
+//
+//    } else {
+//      log.info("app is being used");
+//    }
+//
+//  }
+//
+//  private void turnOffRDS() {
+//    try {
+//      StopDBInstanceRequest stopDBInstanceRequest = new StopDBInstanceRequest();
+//      stopDBInstanceRequest.setDBInstanceIdentifier("sushi-api-prod");
+//      DBInstance dbInstance = amazonRDS.stopDBInstance(stopDBInstanceRequest);
+//      log.info("DBInstance is turned off. status:{}", dbInstance.getDBInstanceStatus());
+//    } catch (Exception e) {
+//      log.info("turnOffRDS Exception: {}", e.getLocalizedMessage());
+//    }
+//
+//  }
+//
+//  private void turnOffECS() {
+//
+//    try {
+//      UpdateServiceRequest updateServiceRequest = new UpdateServiceRequest();
+//
+//      updateServiceRequest.setCluster("pocsoft");
+//      updateServiceRequest.setDesiredCount(0);
+//      updateServiceRequest.setService("sushi-api");
+//
+//      UpdateServiceResult result = amazonECS.updateService(updateServiceRequest);
+//
+//      log.info("UpdateServiceResult:{}", result.toString());
+//    } catch (Exception e) {
+//      log.info("turnOffECS Exception: {}", e.getLocalizedMessage());
+//    }
+//
+//  }
 }

@@ -84,6 +84,11 @@ public class GithubAppConfig {
         .withCredentials(amazonAWSCredentialsProvider).withRegion(Regions.US_WEST_2).build();
   }
   
+  @Bean(name = "xApiKey")
+  public XApiKey xApiKeySecrets() {
+    return awsSecretsManagerService.getXApiKeys();
+  }
+  
   @Bean(name = "stripeSecrets")
   public StripeSecrets stripeSecrets() {
     return awsSecretsManagerService.getStripeSecrets();

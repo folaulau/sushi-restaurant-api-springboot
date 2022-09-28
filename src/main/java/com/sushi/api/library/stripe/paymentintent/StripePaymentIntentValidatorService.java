@@ -11,8 +11,10 @@ import com.sushi.api.entity.user.User;
 
 public interface StripePaymentIntentValidatorService {
 
-  Triple<User, PaymentIntent, Order> validateGuestCreatePaymentIntent(PaymentIntentCreateDTO paymentIntentCreateDTO);
-  
-  Triple<User, PaymentIntent, Order> validateCreatePaymentIntent(PaymentIntentCreateDTO paymentIntentCreateDTO);
+  // Triple<User, PaymentIntent, Order> validateGuestCreatePaymentIntent(
+  // PaymentIntentCreateDTO paymentIntentCreateDTO);
+
+   Triple<User, PaymentIntent, Order> validateCreatePaymentIntent(PaymentIntentCreateDTO
+   paymentIntentCreateDTO);
 
 }

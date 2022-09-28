@@ -106,6 +106,16 @@ public class JwtPayload implements Serializable {
   public boolean isAdmin() {
     return admin != null && admin.booleanValue() == true;
   }
+  
+  public long getUserId() {
+    long userId = 0;
+    try {
+      userId = Long.parseLong(sub);
+    } catch (Exception e) {
+    }
+    return userId;
+    
+  }
 
   public UserType getUserType() {
     if (this.role == null) {

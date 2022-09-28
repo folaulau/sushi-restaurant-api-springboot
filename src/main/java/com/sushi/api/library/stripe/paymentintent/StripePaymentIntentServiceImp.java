@@ -101,121 +101,37 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
                 .putMetadata("orderCostDetails", orderCostDetails.toJson())
                 .putMetadata("env", env);
 
+        if (user != null) {
+          builder.setCustomer(user.getAccount().getStripeCustomerId());
+        }
+        
+        com.stripe.param.PaymentIntentUpdateParams updateParams = builder.build();
+        
+        // @formatter:on
+
+        paymentIntent = paymentIntent.update(updateParams);
+
+        System.out.println("updateParentPaymentIntent paymentIntent=" + paymentIntent.toJson());
+      } catch (StripeException e) {
+        log.warn("StripeException - updateParentPaymentIntent, msg={}", e.getMessage());
+        throw new ApiException(e.getMessage(), "StripeException, msg=" + e.getMessage());
+      }
+
+
+    } else {
+      //@formatter:off
+      com.stripe.param.PaymentIntentCreateParams.Builder builder = PaymentIntentCreateParams.builder()
+              .addPaymentMethodType("card")
+              .setAmount(totalChargeAsCents)
+              .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
+              .setCurrency("usd")
+              .putMetadata("orderCostDetails", orderCostDetails.toJson())
+              .putMetadata("env", env);
+      //@formatter:on
+
+      if (user != null) {
         builder.setCustomer(user.getAccount().getStripeCustomerId());
-
-        com.stripe.param.PaymentIntentUpdateParams updateParams = builder.build();
-        
-        // @formatter:on
-
-        paymentIntent = paymentIntent.update(updateParams);
-
-        System.out.println("updateParentPaymentIntent paymentIntent=" + paymentIntent.toJson());
-      } catch (StripeException e) {
-        log.warn("StripeException - updateParentPaymentIntent, msg={}", e.getMessage());
-        throw new ApiException(e.getMessage(), "StripeException, msg=" + e.getMessage());
       }
-
-
-    } else {
-      //@formatter:off
-      com.stripe.param.PaymentIntentCreateParams.Builder builder = PaymentIntentCreateParams.builder()
-              .addPaymentMethodType("card")
-              .setAmount(totalChargeAsCents)
-              .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
-              .setCurrency("usd")
-              .putMetadata("orderCostDetails", orderCostDetails.toJson())
-              .putMetadata("env", env);
-      //@formatter:on
-
-      builder.setCustomer(user.getAccount().getStripeCustomerId());
-
-      PaymentIntentCreateParams createParams = builder.build();
-
-      try {
-        paymentIntent = PaymentIntent.create(createParams);
-        System.out.println("createParentPaymentIntent paymentIntent=" + paymentIntent.toJson());
-      } catch (StripeException e) {
-        log.warn("StripeException - createParentPaymentIntent, msg={}", e.getMessage());
-        throw new ApiException(e.getMessage(), "StripeException, msg=" + e.getMessage());
-      }
-
-    }
-
-    PaymentIntentDTO paymentIntentDTO =
-        entityDTOMapper.mapOrderCostDetailsToPaymentIntent(orderCostDetails);
-
-    paymentIntentDTO.setStripeCustomerId(user.getAccount().getStripeCustomerId());
-
-    try {
-      com.stripe.model.EphemeralKey key = com.stripe.model.EphemeralKey.create(
-          EphemeralKeyCreateParams.builder().setCustomer(user.getAccount().getStripeCustomerId())
-              .build(),
-          RequestOptions.builder().setReadTimeout(60 * 1000)
-              .setStripeVersionOverride(Stripe.API_VERSION).build());
-      paymentIntentDTO.setEphemeralKey(key.getSecret());
-
-    } catch (StripeException e) {
-      log.warn("StripeException - createParentPaymentIntent EphemeralKey, msg={}", e.getMessage());
-    }
-
-    paymentIntentDTO.setId(paymentIntent.getId());
-    paymentIntentDTO.setClientSecret(paymentIntent.getClientSecret());
-    paymentIntentDTO.setSetupFutureUsage(paymentIntent.getSetupFutureUsage());
-
-    return paymentIntentDTO;
-  }
-
-  @Override
-  public PaymentIntentDTO createGuestPaymentIntent(PaymentIntentCreateDTO paymentIntentParentDTO) {
-    Triple<User, PaymentIntent, Order> triple = stripePaymentIntentValidatorService
-        .validateGuestCreatePaymentIntent(paymentIntentParentDTO);
-
-    PaymentIntent paymentIntent = triple.getMiddle();
-
-    Order order = triple.getRight();
-
-    OrderCostDetails orderCostDetails = orderCalculatorService.calculateOrderTotalCost(order,
-        paymentIntentParentDTO.getDeliveryMethod(), paymentIntentParentDTO.getDeliveryAddress());
-
-    long totalChargeAsCents = BigDecimal.valueOf(orderCostDetails.getTotal())
-        .multiply(BigDecimal.valueOf(100)).longValue();
-
-    if (paymentIntent != null) {
-
-      try {
-
-        // @formatter:off
-
-        com.stripe.param.PaymentIntentUpdateParams.Builder builder = com.stripe.param.PaymentIntentUpdateParams.builder()
-                .setAmount(totalChargeAsCents)
-                .putMetadata("orderCostDetails", orderCostDetails.toJson())
-                .putMetadata("env", env);
-
-
-        com.stripe.param.PaymentIntentUpdateParams updateParams = builder.build();
-        
-        // @formatter:on
-
-        paymentIntent = paymentIntent.update(updateParams);
-
-        System.out.println("updateParentPaymentIntent paymentIntent=" + paymentIntent.toJson());
-      } catch (StripeException e) {
-        log.warn("StripeException - updateParentPaymentIntent, msg={}", e.getMessage());
-        throw new ApiException(e.getMessage(), "StripeException, msg=" + e.getMessage());
-      }
-
-
-    } else {
-      //@formatter:off
-      com.stripe.param.PaymentIntentCreateParams.Builder builder = PaymentIntentCreateParams.builder()
-              .addPaymentMethodType("card")
-              .setAmount(totalChargeAsCents)
-              .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
-              .setCurrency("usd")
-              .putMetadata("orderCostDetails", orderCostDetails.toJson())
-              .putMetadata("env", env);
-      //@formatter:on
-
 
       PaymentIntentCreateParams createParams = builder.build();
 
@@ -230,29 +146,138 @@ public class StripePaymentIntentServiceImp implements StripePaymentIntentService
     }
 
     order.setDeliveryMethod(paymentIntentParentDTO.getDeliveryMethod());
-    
-    order = entityDTOMapper.patchOrderWithCostDetails(orderCostDetails,order);
+
+    order = entityDTOMapper.patchOrderWithCostDetails(orderCostDetails, order);
 
     if (paymentIntentParentDTO.getDeliveryMethod().equals(DeliveryMethod.DROP_OFF)) {
-      
-      Address address = order.getAddress()!=null ? order.getAddress() : new Address();
 
-      address = entityDTOMapper.patchAddressWithAddressCreateUpdateDTO(paymentIntentParentDTO.getDeliveryAddress(),
-          address
-          );
-      
+      Address address = order.getAddress() != null ? order.getAddress() : new Address();
+
+      address = entityDTOMapper.patchAddressWithAddressCreateUpdateDTO(
+          paymentIntentParentDTO.getDeliveryAddress(), address);
+
       order.setAddress(address);
 
     }
+
+    order.setUser(user);
 
     order = orderDAO.save(order);
 
     PaymentIntentDTO paymentIntentDTO =
         entityDTOMapper.mapOrderCostDetailsToPaymentIntent(orderCostDetails);
+
+    if (user != null) {
+      paymentIntentDTO.setStripeCustomerId(user.getAccount().getStripeCustomerId());
+
+      try {
+        com.stripe.model.EphemeralKey key = com.stripe.model.EphemeralKey.create(
+            EphemeralKeyCreateParams.builder().setCustomer(user.getAccount().getStripeCustomerId())
+                .build(),
+            RequestOptions.builder().setReadTimeout(60 * 1000)
+                .setStripeVersionOverride(Stripe.API_VERSION).build());
+        paymentIntentDTO.setEphemeralKey(key.getSecret());
+
+      } catch (StripeException e) {
+        log.warn("StripeException - createParentPaymentIntent EphemeralKey, msg={}",
+            e.getMessage());
+      }
+    }
+
     paymentIntentDTO.setId(paymentIntent.getId());
     paymentIntentDTO.setClientSecret(paymentIntent.getClientSecret());
     paymentIntentDTO.setSetupFutureUsage(paymentIntent.getSetupFutureUsage());
 
     return paymentIntentDTO;
   }
+
+
+  // public PaymentIntentDTO createGuestPaymentIntent(PaymentIntentCreateDTO paymentIntentParentDTO)
+  // {
+  // Triple<User, PaymentIntent, Order> triple = null;
+  //
+  // PaymentIntent paymentIntent = triple.getMiddle();
+  //
+  // Order order = triple.getRight();
+  //
+  // OrderCostDetails orderCostDetails = orderCalculatorService.calculateOrderTotalCost(order,
+  // paymentIntentParentDTO.getDeliveryMethod(), paymentIntentParentDTO.getDeliveryAddress());
+  //
+  // long totalChargeAsCents = BigDecimal.valueOf(orderCostDetails.getTotal())
+  // .multiply(BigDecimal.valueOf(100)).longValue();
+  //
+  // if (paymentIntent != null) {
+  //
+  // try {
+  //
+//        // @formatter:off
+//
+//        com.stripe.param.PaymentIntentUpdateParams.Builder builder = com.stripe.param.PaymentIntentUpdateParams.builder()
+//                .setAmount(totalChargeAsCents)
+//                .putMetadata("orderCostDetails", orderCostDetails.toJson())
+//                .putMetadata("env", env);
+//
+//
+//        com.stripe.param.PaymentIntentUpdateParams updateParams = builder.build();
+//        
+//        // @formatter:on
+  //
+  // paymentIntent = paymentIntent.update(updateParams);
+  //
+  // System.out.println("updateParentPaymentIntent paymentIntent=" + paymentIntent.toJson());
+  // } catch (StripeException e) {
+  // log.warn("StripeException - updateParentPaymentIntent, msg={}", e.getMessage());
+  // throw new ApiException(e.getMessage(), "StripeException, msg=" + e.getMessage());
+  // }
+  //
+  //
+  // } else {
+//      //@formatter:off
+//      com.stripe.param.PaymentIntentCreateParams.Builder builder = PaymentIntentCreateParams.builder()
+//              .addPaymentMethodType("card")
+//              .setAmount(totalChargeAsCents)
+//              .setCaptureMethod(PaymentIntentCreateParams.CaptureMethod.AUTOMATIC)
+//              .setCurrency("usd")
+//              .putMetadata("orderCostDetails", orderCostDetails.toJson())
+//              .putMetadata("env", env);
+//      //@formatter:on
+  //
+  //
+  // PaymentIntentCreateParams createParams = builder.build();
+  //
+  // try {
+  // paymentIntent = PaymentIntent.create(createParams);
+  // System.out.println("createParentPaymentIntent paymentIntent=" + paymentIntent.toJson());
+  // } catch (StripeException e) {
+  // log.warn("StripeException - createParentPaymentIntent, msg={}", e.getMessage());
+  // throw new ApiException(e.getMessage(), "StripeException, msg=" + e.getMessage());
+  // }
+  //
+  // }
+  //
+  // order.setDeliveryMethod(paymentIntentParentDTO.getDeliveryMethod());
+  //
+  // order = entityDTOMapper.patchOrderWithCostDetails(orderCostDetails, order);
+  //
+  // if (paymentIntentParentDTO.getDeliveryMethod().equals(DeliveryMethod.DROP_OFF)) {
+  //
+  // Address address = order.getAddress() != null ? order.getAddress() : new Address();
+  //
+  // address = entityDTOMapper.patchAddressWithAddressCreateUpdateDTO(
+  // paymentIntentParentDTO.getDeliveryAddress(), address);
+  //
+  // order.setAddress(address);
+  //
+  // }
+  //
+  // order = orderDAO.save(order);
+  //
+  // PaymentIntentDTO paymentIntentDTO =
+  // entityDTOMapper.mapOrderCostDetailsToPaymentIntent(orderCostDetails);
+  // paymentIntentDTO.setId(paymentIntent.getId());
+  // paymentIntentDTO.setClientSecret(paymentIntent.getClientSecret());
+  // paymentIntentDTO.setSetupFutureUsage(paymentIntent.getSetupFutureUsage());
+  //
+  // return paymentIntentDTO;
+  // }
 }

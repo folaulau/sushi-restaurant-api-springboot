@@ -53,23 +53,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
         log.debug("jwtPayload={}", ObjectUtils.toJson(jwtPayload));
 
-        if (jwtPayload == null) {
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setStatus(UNAUTHORIZED.value());
-
-            String message = "Invalid token in header";
-            log.debug("Error message: {}, context path: {}, url: {}", message, request.getContextPath(), request.getRequestURI());
-
-            try {
-                ObjectUtils.getObjectMapper().writeValue(response.getWriter(), new ApiError(UNAUTHORIZED, "Access Denied", message, "Unable to verify token"));
-            } catch (IOException e) {
-                log.warn("IOException, msg={}", e.getLocalizedMessage());
-            }
-
-            return false;
-        }
-
-        ApiSessionUtils.setSessionToken(new WebAuthenticationDetails(request), jwtPayload);
+        ApiSessionUtils.setSessionToken( jwtPayload);
 
         return true;
     }

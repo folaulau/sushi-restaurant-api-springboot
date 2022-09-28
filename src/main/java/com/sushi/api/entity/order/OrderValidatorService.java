@@ -17,5 +17,7 @@ public interface OrderValidatorService {
   
   Pair<Order, LineItem> validateRemoval(OrderRemoveRequestDTO orderRemoveRequestDTO);
 
-  Pair<Order, PaymentIntent> validatePayment(OrderConfirmDTO orderConfirmDTO);  
+  Pair<Order, PaymentIntent> validatePayment(OrderConfirmDTO orderConfirmDTO);
+
+  Order validateGetByUuid(String uuid);  
 }

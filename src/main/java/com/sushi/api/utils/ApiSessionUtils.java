@@ -17,143 +17,98 @@ import com.sushi.api.security.jwt.JwtPayload;
 
 public interface ApiSessionUtils {
 
-    static Logger log = LoggerFactory.getLogger(ApiSessionUtils.class);
+  static Logger log = LoggerFactory.getLogger(ApiSessionUtils.class);
 
-    public static void setSessionToken(WebAuthenticationDetails authDetails, ApiSession apiSession) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
+//  public static void setSessionToken(WebAuthenticationDetails authDetails, ApiSession apiSession) {
+//    List<GrantedAuthority> authorities = new ArrayList<>();
+//
+//    if (apiSession.getUserRoles() != null || apiSession.getUserRoles().isEmpty() == false) {
+//      for (String role : apiSession.getUserRoles()) {
+//        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+//      }
+//    }
+//
+//    UsernamePasswordAuthenticationToken updateAuth =
+//        new UsernamePasswordAuthenticationToken(apiSession, apiSession.getUserUuid(), authorities);
+//
+//    updateAuth.setDetails(authDetails);
+//
+//    SecurityContextHolder.getContext().setAuthentication(updateAuth);
+//  }
+//
+//  public static void setSessionToken(WebAuthenticationDetails authDetails, JwtPayload jwtPayload) {
+//    List<GrantedAuthority> authorities = new ArrayList<>();
+//
+//    if (jwtPayload.getRole() != null || jwtPayload.getRole().isEmpty() == false) {
+//      authorities.add(new SimpleGrantedAuthority("ROLE_" + jwtPayload.getRole().toUpperCase()));
+//    }
+//
+//    UsernamePasswordAuthenticationToken updateAuth =
+//        new UsernamePasswordAuthenticationToken(jwtPayload, jwtPayload.getUuid(), authorities);
+//
+//    updateAuth.setDetails(authDetails);
+//
+//    SecurityContextHolder.getContext().setAuthentication(updateAuth);
+//  }
 
-        if (apiSession.getUserRoles() != null || apiSession.getUserRoles().isEmpty() == false) {
-            for (String role : apiSession.getUserRoles()) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
-            }
-        }
+  public static void setSessionToken(JwtPayload jwtPayload) {
+    List<GrantedAuthority> authorities = new ArrayList<>();
 
-        UsernamePasswordAuthenticationToken updateAuth = new UsernamePasswordAuthenticationToken(apiSession, apiSession.getUserUuid(), authorities);
-
-        updateAuth.setDetails(authDetails);
-
-        SecurityContextHolder.getContext().setAuthentication(updateAuth);
+    if (jwtPayload.getRole() != null || jwtPayload.getRole().isEmpty() == false) {
+      authorities.add(new SimpleGrantedAuthority("ROLE_" + jwtPayload.getRole().toUpperCase()));
     }
 
-    public static void setSessionToken(WebAuthenticationDetails authDetails, JwtPayload jwtPayload) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
+    UsernamePasswordAuthenticationToken updateAuth =
+        new UsernamePasswordAuthenticationToken(jwtPayload, jwtPayload.getUuid(), authorities);
 
-        if (jwtPayload.getRole() != null || jwtPayload.getRole().isEmpty() == false) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + jwtPayload.getRole().toUpperCase()));
-        }
+    SecurityContextHolder.getContext().setAuthentication(updateAuth);
+  }
 
-        UsernamePasswordAuthenticationToken updateAuth = new UsernamePasswordAuthenticationToken(jwtPayload, jwtPayload.getUuid(), authorities);
+  public static JwtPayload getJwtPayload() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth != null) {
+      try {
+        JwtPayload session = (JwtPayload) auth.getPrincipal();
+        return session;
+      } catch (Exception e) {
+        log.warn("Exception, msg={}", e.getLocalizedMessage());
+      }
 
-        updateAuth.setDetails(authDetails);
-
-        SecurityContextHolder.getContext().setAuthentication(updateAuth);
     }
+    return null;
+  }
 
-    public static JwtPayload getJwtPayload() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            try {
-                JwtPayload session = (JwtPayload) auth.getPrincipal();
-                return session;
-            } catch (Exception e) {
-                log.warn("Exception, msg={}", e.getLocalizedMessage());
-            }
-
-        }
-        return null;
+  public static Long getUserId() {
+    JwtPayload jwtPayload = getJwtPayload();
+    if (jwtPayload != null) {
+      try {
+        return jwtPayload.getUserId();
+      } catch (Exception e) {
+        log.warn("Exception, msg={}", e.getLocalizedMessage());
+      }
     }
+    return null;
+  }
 
-    public static ApiSession getApiSession() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            try {
-                ApiSession session = (ApiSession) auth.getPrincipal();
-                return session;
-            } catch (Exception e) {
-                log.warn("Exception, msg={}", e.getLocalizedMessage());
-            }
-
-        }
-        return null;
+  public static String getUserUuid() {
+    JwtPayload jwtPayload = getJwtPayload();
+    if (jwtPayload != null) {
+      try {
+        return jwtPayload.getUuid();
+      } catch (Exception e) {
+        log.warn("Exception, msg={}", e.getLocalizedMessage());
+      }
     }
+    return null;
+  }
 
-    public static Long getUserId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            try {
-                ApiSession session = (ApiSession) auth.getPrincipal();
-                return session.getUserId();
-            } catch (Exception e) {
-                log.warn("Exception, msg={}", e.getLocalizedMessage());
-            }
-
-        }
-        return null;
+  public static String getActiveProfile(Environment environment) {
+    String env = "";
+    try {
+      env = Arrays.asList(environment.getActiveProfiles()).get(0);
+    } catch (Exception e) {
     }
-
-    public static Long getAccountId() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            try {
-                ApiSession session = (ApiSession) auth.getPrincipal();
-                return session.getAccountId();
-            } catch (Exception e) {
-                log.warn("Exception, msg={}", e.getLocalizedMessage());
-            }
-
-        }
-        return null;
-    }
-
-    public static String getAccountUuid() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            try {
-                ApiSession session = (ApiSession) auth.getPrincipal();
-                return session.getAccountUuid();
-            } catch (Exception e) {
-                log.warn("Exception, msg={}", e.getLocalizedMessage());
-            }
-
-        }
-        return null;
-    }
-
-    public static String getUserUuid() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            try {
-                ApiSession session = (ApiSession) auth.getPrincipal();
-                return session.getUserUuid();
-            } catch (Exception e) {
-                log.warn("Exception, msg={}", e.getLocalizedMessage());
-            }
-
-        }
-        return null;
-    }
-
-    public static String getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            try {
-                ApiSession session = (ApiSession) auth.getPrincipal();
-                return session.getUserUuid();
-            } catch (Exception e) {
-                log.warn("Exception, msg={}", e.getLocalizedMessage());
-            }
-
-        }
-        return "SYSTEM";
-    }
-
-    public static String getActiveProfile(Environment environment) {
-        String env = "";
-        try {
-            env = Arrays.asList(environment.getActiveProfiles()).get(0);
-        } catch (Exception e) {
-        }
-        return env;
-    }
+    return env;
+  }
 
 }

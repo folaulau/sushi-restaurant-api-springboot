@@ -119,11 +119,9 @@ public class OrderServiceImp implements OrderService {
 
   @Override
   public OrderDTO getByUuid(String uuid) {
+    Order order = orderValidatorService.validateGetByUuid(uuid);
 
-    Optional<Order> optOrder = orderDAO.findByUuid(uuid);
-
-    return entityDTOMapper.mapOrderToOrderDTO(optOrder.orElseThrow(
-        () -> new ApiException("Order not found", "order not found for uuid=" + uuid)));
+    return entityDTOMapper.mapOrderToOrderDTO(order);
   }
 
   @Override

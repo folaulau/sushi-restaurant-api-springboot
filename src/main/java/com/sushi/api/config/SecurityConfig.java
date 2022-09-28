@@ -18,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.context.NullSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import com.sushi.api.security.AuthorizationFilter;
 import com.sushi.api.security.CustomAcccessDeniedHandler;
 import com.sushi.api.security.CustomLogoutHandler;
 import com.sushi.api.security.CustomLogoutSuccessHandler;
@@ -37,18 +36,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomLogoutSuccessHandler customLogoutSuccessHandler;
+//
+//    @Bean
+//    public AuthorizationFilter authorizationFilter() {
+//        return new AuthorizationFilter();
+//    }
 
-    @Bean
-    public AuthorizationFilter authorizationFilter() {
-        return new AuthorizationFilter();
-    }
-
-    @Bean
-    public RegistrationBean jwtAuthFilterRegister(AuthorizationFilter customAuthenticationFilter) {
-        FilterRegistrationBean<AuthorizationFilter> registrationBean = new FilterRegistrationBean<>(customAuthenticationFilter);
-        registrationBean.setEnabled(false);
-        return registrationBean;
-    }
+//    @Bean
+//    public RegistrationBean jwtAuthFilterRegister(AuthorizationFilter customAuthenticationFilter) {
+//        FilterRegistrationBean<AuthorizationFilter> registrationBean = new FilterRegistrationBean<>(customAuthenticationFilter);
+//        registrationBean.setEnabled(false);
+//        return registrationBean;
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -77,10 +76,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .addLogoutHandler(customLogoutHandler)
             .logoutSuccessHandler(customLogoutSuccessHandler);
 
-        http.addFilterBefore(securityContextPersistenceFilter(), UsernamePasswordAuthenticationFilter.class);
+        //http.addFilterBefore(securityContextPersistenceFilter(), UsernamePasswordAuthenticationFilter.class);
         
         // request authorization filter
-        http.addFilterBefore(authorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        //http.addFilterBefore(authorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
@@ -114,9 +113,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return methodInvokingFactoryBean;
     }
 
-    @Bean
-    public SecurityContextPersistenceFilter securityContextPersistenceFilter() {
-        return new SecurityContextPersistenceFilter(new NullSecurityContextRepository());
-    }
+//    @Bean
+//    public SecurityContextPersistenceFilter securityContextPersistenceFilter() {
+//        return new SecurityContextPersistenceFilter(new NullSecurityContextRepository());
+//    }
 
 }

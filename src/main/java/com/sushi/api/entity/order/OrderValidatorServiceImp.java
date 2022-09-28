@@ -25,6 +25,7 @@ import com.sushi.api.entity.user.User;
 import com.sushi.api.entity.user.UserDAO;
 import com.sushi.api.exception.ApiException;
 import com.sushi.api.library.stripe.paymentintent.StripePaymentIntentService;
+import com.sushi.api.utils.ApiSessionUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -103,8 +104,6 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
 
     }
 
-
-
     return Triple.of(order, user, lineItemCreateDTO);
 
   }
@@ -172,6 +171,22 @@ public class OrderValidatorServiceImp implements OrderValidatorService {
     }
 
     return Pair.of(order, paymentIntent);
+  }
+
+
+  @Override
+  public Order validateGetByUuid(String uuid) {
+    Optional<Order> optOrder = orderDAO.findByUuid(uuid);
+
+    Order order = optOrder
+        .orElseThrow(() -> new ApiException("Order not found", "order not found for uuid=" + uuid));
+
+    if (order.getUser() != null && !order.getUser().getId().equals(ApiSessionUtils.getUserId())) {
+      throw new ApiException("Invalid Order",
+          "You are trying to view an order that does not belong to you");
+    }
+
+    return order;
   }
 
 

@@ -37,27 +37,18 @@ public class OrderController {
   public ResponseEntity<OrderDTO> createUpdateOrder(
       @RequestHeader(name = "token", required = false) String token, @Parameter(name = "Order",
           required = true, example = "order") @Valid @RequestBody OrderRequestDTO orderRequestDTO) {
-    log.debug("createUpdateOrder(...)");
+    log.debug("createUpdateOrder(token={})", token);
 
     OrderDTO orderDTO = orderService.createUpdateOrder(orderRequestDTO);
 
     return new ResponseEntity<>(orderDTO, HttpStatus.OK);
   }
 
-  @Operation(summary = "Create Order", description = "create or update guest order")
-  @PostMapping("/guest/current")
-  public ResponseEntity<OrderDTO> createUpdateGuestOrder(@Parameter(name = "Order", required = true,
-      example = "order") @Valid @RequestBody OrderRequestDTO orderRequestDTO) {
-    log.debug("createUpdateGuestOrder(...)");
-
-    OrderDTO orderDTO = orderService.createUpdateOrder(orderRequestDTO);
-
-    return new ResponseEntity<>(orderDTO, HttpStatus.OK);
-  }
-  
   @Operation(summary = "Remove Item from Order", description = "remove item from order")
-  @PutMapping("/guest/current/remove-item")
-  public ResponseEntity<OrderDTO> removeGuest(@Parameter(name = "OrderRemoval", required = true,
+  @PutMapping("/current/remove-item")
+  public ResponseEntity<OrderDTO> removeGuest(
+      @RequestHeader(name = "token", required = false) String token,
+      @Parameter(name = "OrderRemoval", required = true,
       example = "order removal") @Valid @RequestBody OrderRemoveRequestDTO orderRemoveRequestDTO) {
     log.debug("remove({})", orderRemoveRequestDTO.toString());
 
@@ -65,36 +56,28 @@ public class OrderController {
 
     return new ResponseEntity<>(orderDTO, HttpStatus.OK);
   }
-  
+
   /**
    * Payment has been made in the frontend, verify and update order details
    */
   @Operation(summary = "Confirm Payment", description = "Confirm payment")
-  @PutMapping("/guest/confirm-payment")
-  public ResponseEntity<OrderDTO> confirmQuestPayment(@Parameter(name = "OrderConfirm", required = true,
-      example = "order confirmatioin") @Valid @RequestBody OrderConfirmDTO orderConfirmDTO ) {
+  @PutMapping("/confirm-payment")
+  public ResponseEntity<OrderDTO> confirmQuestPayment(
+      @RequestHeader(name = "token", required = false) String token,
+      @Parameter(name = "OrderConfirm", required = true,
+          example = "order confirmatioin") @Valid @RequestBody OrderConfirmDTO orderConfirmDTO) {
     log.debug("confirmQuestPayment({})", orderConfirmDTO.toString());
 
     OrderDTO orderDTO = orderService.confirmGuestPayment(orderConfirmDTO);
 
     return new ResponseEntity<>(orderDTO, HttpStatus.OK);
   }
-  
-  @Operation(summary = "Get Order", description = "get guest order")
-  @GetMapping("/guest/current")
-  public ResponseEntity<OrderDTO> getGuestOrder(@Parameter(name = "uuid", required = true,
-      example = "uuid") @RequestParam String uuid) {
-    log.debug("getGuestOrder({})", uuid);
 
-    OrderDTO orderDTO = orderService.getByUuid(uuid);
-
-    return new ResponseEntity<>(orderDTO, HttpStatus.OK);
-  }
-  
   @Operation(summary = "Get Order", description = "get order")
   @GetMapping("/current")
-  public ResponseEntity<OrderDTO> getOrder(@Parameter(name = "uuid", required = true,
-      example = "uuid") @RequestParam String uuid) {
+  public ResponseEntity<OrderDTO> getOrder(
+      @RequestHeader(name = "token", required = false) String token,
+      @Parameter(name = "uuid", required = true, example = "uuid") @RequestParam String uuid) {
     log.debug("getOrder({})", uuid);
 
     OrderDTO orderDTO = orderService.getByUuid(uuid);

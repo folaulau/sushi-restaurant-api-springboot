@@ -51,4 +51,9 @@ public interface EntityDTOMapper {
   Reservation patchReservationWithReservationUpdateDTO(ReservationUpdateDTO reservationUpdateDTO,
       @MappingTarget Reservation reservation);
 
+  UserDTO mapUserToUserDTO(User user);
+
+  @Mappings({@Mapping(target = "uuid", ignore = true)})
+  User patchUserWithUserUpdateDTO(UserUpdateDTO userUpdateDTO, @MappingTarget User user);
+
 }

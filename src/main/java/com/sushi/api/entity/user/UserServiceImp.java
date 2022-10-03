@@ -9,6 +9,9 @@ import com.google.firebase.auth.UserRecord;
 import com.stripe.model.Customer;
 import com.sushi.api.dto.AuthenticationResponseDTO;
 import com.sushi.api.dto.AuthenticatorDTO;
+import com.sushi.api.dto.EntityDTOMapper;
+import com.sushi.api.dto.UserDTO;
+import com.sushi.api.dto.UserUpdateDTO;
 import com.sushi.api.entity.account.Account;
 import com.sushi.api.entity.account.AccountDAO;
 import com.sushi.api.entity.address.Address;
@@ -41,6 +44,14 @@ public class UserServiceImp implements UserService {
   @Autowired
   private UserDAO userDAO;
 
+  @Autowired
+  private EntityDTOMapper entityDTOMapper;
+
+  @Override
+  public User getByUuid(String uuid) throws ApiException {
+    return userDAO.findByUuid(uuid).orElseThrow(() -> new ApiException("User not found"));
+  }
+
   @Override
   public AuthenticationResponseDTO authenticate(AuthenticatorDTO authenticatorDTO) {
     UserRecord userRecord = firebaseAuthService.verifyAndGetUser(authenticatorDTO.getToken());
@@ -66,14 +77,18 @@ public class UserServiceImp implements UserService {
       /**
        * sign up
        */
-      
+
       Account account = new Account();
       account = accountDAO.save(account);
 
       user = new User();
       user.setUuid(userRecord.getUid());
       user.addRole(new Role(UserType.user));
-      user.setAddress(new Address());
+      
+      Address address = new Address();
+      user.setAddress(address);
+      address.setUser(user);
+      
       user.setStatus(UserStatus.ACTIVE);
       user.setAccount(account);
 
@@ -135,4 +150,21 @@ public class UserServiceImp implements UserService {
     return authenticationResponseDTO;
   }
 
+  @Override
+  public UserDTO getProfile(String uuid) {
+    User user = getByUuid(uuid);
+    return entityDTOMapper.mapUserToUserDTO(user);
+  }
+
+  @Override
+  public UserDTO updateProfle(UserUpdateDTO userUpdateDTO) {
+    
+    User user = getByUuid(userUpdateDTO.getUuid());
+    
+    user = entityDTOMapper.patchUserWithUserUpdateDTO(userUpdateDTO,user);
+    
+    user = userDAO.save(user);
+    
+    return entityDTOMapper.mapUserToUserDTO(user);
+  }
 }

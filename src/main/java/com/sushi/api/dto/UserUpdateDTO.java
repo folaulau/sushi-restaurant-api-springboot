@@ -25,6 +25,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -56,37 +57,22 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(value = Include.NON_NULL)
-public class UserDTO implements Serializable {
+public class UserUpdateDTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private Long id;
-
+  @NotNull(message = "uuid is required")
   private String uuid;
 
   private String firstName;
 
   private String lastName;
 
-  private String thirdPartyName;
-
-  private String email;
-
   private String phoneNumber;
-  
+
   @JsonFormat(pattern="yyyy-MM-dd")
   private LocalDate dob;
 
-  private AccountDTO account;
-
-  @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime createdAt;
-
-  @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime updatedAt;
-
-  private UserStatus status;
-
-  private AddressDTO address;
+  private AddressCreateUpdateDTO address;
 
 }

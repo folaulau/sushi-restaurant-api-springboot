@@ -26,6 +26,7 @@ import org.hibernate.annotations.ResultCheckStyle;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -59,6 +60,7 @@ public class ReservationDTO implements Serializable {
 
   private String name;
 
+  @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
   private LocalDateTime dateTime;
 
   private Integer numberOfPeople;
@@ -67,8 +69,10 @@ public class ReservationDTO implements Serializable {
 
   private boolean deleted;
 
+  @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
   private LocalDateTime createdAt;
 
+  @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
   private LocalDateTime updatedAt;
 
 

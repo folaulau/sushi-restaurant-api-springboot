@@ -1,18 +1,163 @@
 - table:
-    schema: public
     name: accounts
+    schema: public
   array_relationships:
     - name: users
       using:
         foreign_key_constraint_on:
           column: account_id
           table:
-            schema: public
             name: users
+            schema: public
 - table:
+    name: addresses
     schema: public
+  object_relationships:
+    - name: user
+      using:
+        foreign_key_constraint_on: user_id
+  array_relationships:
+    - name: orders
+      using:
+        foreign_key_constraint_on:
+          column: address_id
+          table:
+            name: orders
+            schema: public
+- table:
+    name: flyway_schema_history
+    schema: public
+- table:
+    name: line_items
+    schema: public
+  object_relationships:
+    - name: order
+      using:
+        foreign_key_constraint_on: order_id
+    - name: product
+      using:
+        foreign_key_constraint_on: product_id
+- table:
+    name: orders
+    schema: public
+  object_relationships:
+    - name: address
+      using:
+        foreign_key_constraint_on: address_id
+    - name: payment
+      using:
+        foreign_key_constraint_on: payment_id
+    - name: user
+      using:
+        foreign_key_constraint_on: user_id
+  array_relationships:
+    - name: line_items
+      using:
+        foreign_key_constraint_on:
+          column: order_id
+          table:
+            name: line_items
+            schema: public
+- table:
+    name: payment_methods
+    schema: public
+  object_relationships:
+    - name: user
+      using:
+        foreign_key_constraint_on: user_id
+- table:
+    name: payments
+    schema: public
+  array_relationships:
+    - name: orders
+      using:
+        foreign_key_constraint_on:
+          column: payment_id
+          table:
+            name: orders
+            schema: public
+- table:
+    name: products
+    schema: public
+  array_relationships:
+    - name: line_items
+      using:
+        foreign_key_constraint_on:
+          column: product_id
+          table:
+            name: line_items
+            schema: public
+- table:
+    name: reservations
+    schema: public
+  object_relationships:
+    - name: user
+      using:
+        foreign_key_constraint_on: user_id
+- table:
+    name: roles
+    schema: public
+  array_relationships:
+    - name: user_roles
+      using:
+        foreign_key_constraint_on:
+          column: role_id
+          table:
+            name: user_roles
+            schema: public
+- table:
+    name: server_activities
+    schema: public
+- table:
+    name: user_roles
+    schema: public
+  object_relationships:
+    - name: role
+      using:
+        foreign_key_constraint_on: role_id
+    - name: user
+      using:
+        foreign_key_constraint_on: parent_id
+- table:
     name: users
+    schema: public
   object_relationships:
     - name: account
       using:
         foreign_key_constraint_on: account_id
+  array_relationships:
+    - name: addresses
+      using:
+        foreign_key_constraint_on:
+          column: user_id
+          table:
+            name: addresses
+            schema: public
+    - name: orders
+      using:
+        foreign_key_constraint_on:
+          column: user_id
+          table:
+            name: orders
+            schema: public
+    - name: payment_methods
+      using:
+        foreign_key_constraint_on:
+          column: user_id
+          table:
+            name: payment_methods
+            schema: public
+    - name: reservations
+      using:
+        foreign_key_constraint_on:
+          column: user_id
+          table:
+            name: reservations
+            schema: public
+    - name: user_roles
+      using:
+        foreign_key_constraint_on:
+          column: parent_id
+          table:
+            name: user_roles
+            schema: public

@@ -1,20 +1,13 @@
 package com.sushi.api.security;
 
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 import com.sushi.api.dto.AuthenticationResponseDTO;
 import com.sushi.api.dto.EntityDTOMapper;
 import com.sushi.api.entity.user.User;
-import com.sushi.api.exception.ApiError;
 import com.sushi.api.security.jwt.JwtPayload;
 import com.sushi.api.security.jwt.JwtTokenService;
 import com.sushi.api.utils.ApiSessionUtils;
@@ -39,6 +32,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
     @Override
     public AuthenticationResponseDTO authenticate(User user) {
+        
         String jwt = jwtTokenService.generateUserToken(user);
 
         AuthenticationResponseDTO auth = entityDTOMapper.mapUserToAuthenticationResponse(user);
@@ -53,7 +47,7 @@ public class AuthenticationServiceImp implements AuthenticationService {
 
         log.debug("jwtPayload={}", ObjectUtils.toJson(jwtPayload));
 
-        ApiSessionUtils.setSessionToken( jwtPayload);
+        ApiSessionUtils.setSessionToken(jwtPayload);
 
         return true;
     }

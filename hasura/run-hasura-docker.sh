@@ -1,6 +1,6 @@
 #! /bin/bash
 
-version=v2.3.0
+version=v2.34.0
 image=hasura/graphql-engine
 containerInternalPort=8080
 containerPublicPort=7008

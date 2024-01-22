@@ -44,7 +44,7 @@ public class JwtTokenService {
             hasura.put("x-hasura-allowed-roles", UserType.getAllAuths());
             hasura.put("x-hasura-default-role", UserType.user.name());
             hasura.put("x-Hasura-user-id", user.getId() + "");
-            hasura.put("x-Hasura-user-uuid", user.getUuid());
+//            hasura.put("x-Hasura-user-uuid", user.getUuid());
 
       // @formatter:off
 
@@ -89,8 +89,8 @@ public class JwtTokenService {
                 jwtPayload.setSub(jwt.getSubject());
                 jwtPayload.setAud(jwt.getAudience().get(0));
                 jwtPayload.setName(jwt.getClaim("name").asString());
-                jwtPayload.setUuid(jwt.getClaim("uuid").asString());
                 jwtPayload.setRole(jwt.getClaim("role").asString());
+//                jwtPayload.setUuid(jwt.getClaim("uuid").asString());
 
                 setHasura(jwtPayload, jwt);
 

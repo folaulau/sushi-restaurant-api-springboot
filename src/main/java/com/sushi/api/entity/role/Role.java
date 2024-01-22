@@ -19,14 +19,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.sushi.api.entity.DatabaseTableNames;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Setter
-@Getter
-@ToString
+
+@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(value = Include.NON_NULL)

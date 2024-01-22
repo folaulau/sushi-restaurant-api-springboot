@@ -41,7 +41,7 @@ public class UserValidatorServiceImp implements UserValidatorService {
 
         User user = optUser.orElseThrow(() -> new ApiException("Email not found"));
 
-        if (!user.getPassword().equals(PasswordUtils.hashPassword(userSignInDTO.getPassword()))) {
+        if (!PasswordUtils.verify(userSignInDTO.getPassword(), user.getPassword())) {
             log.info("invalid password");
             throw new ApiException("Invalid credentials");
         }

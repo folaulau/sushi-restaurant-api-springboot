@@ -32,13 +32,11 @@ public class AccountDataLoader implements ApplicationRunner {
 
         for (int i = 1; i <= numberOfAccount; i++) {
             Account account = new Account();
-            account.setId(new Long(i));
-            account.setUuid("acct-uuid-" + i);
+            account.setId(Long.parseLong(i+""));
             account = accountDAO.save(account);
 
             User user = new User();
-            user.setId(new Long(i));
-            user.setUuid("user-uuid-" + i);
+            user.setId(Long.parseLong(i+""));
             user.setAccount(account);
 
             String firstName = RandomGeneratorUtils.getRandomFirstname();

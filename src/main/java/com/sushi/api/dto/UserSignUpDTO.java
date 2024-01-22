@@ -21,6 +21,10 @@ public class UserSignUpDTO implements Serializable {
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private String            firstName;
+    
+    private String            lastName;
 
     @Email
     private String            email;

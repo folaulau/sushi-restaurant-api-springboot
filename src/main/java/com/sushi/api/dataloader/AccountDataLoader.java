@@ -10,6 +10,7 @@ import com.sushi.api.entity.account.Account;
 import com.sushi.api.entity.account.AccountDAO;
 import com.sushi.api.entity.user.User;
 import com.sushi.api.entity.user.UserDAO;
+import com.sushi.api.entity.user.UserStatus;
 import com.sushi.api.utils.PasswordUtils;
 import com.sushi.api.utils.RandomGeneratorUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,8 @@ public class AccountDataLoader implements ApplicationRunner {
             user.setLastName(lastName);
 
             user.setEmail((firstName + lastName).toLowerCase() + "@gmail.com");
+            
+            user.setStatus(UserStatus.ACTIVE);
 
             user.setDob(LocalDate.now().minusYears(RandomGeneratorUtils.getIntegerWithin(10, 40)));
 

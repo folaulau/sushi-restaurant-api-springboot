@@ -64,8 +64,18 @@ public class UserServiceImp implements UserService {
 
         User user = userValidatorService.validateSignUp(userSignUpDTO);
 
-        user = User.builder().email(userSignUpDTO.getEmail()).password(PasswordUtils.hashPassword(userSignUpDTO.getPassword())).phoneNumber(userSignUpDTO.getPhoneNumber()).build();
+        // @formatter:off
 
+        user = User.builder()
+                .email(userSignUpDTO.getEmail())
+                .firstName(userSignUpDTO.getFirstName())
+                .lastName(userSignUpDTO.getLastName())
+                .password(PasswordUtils.hashPassword(userSignUpDTO.getPassword()))
+                .phoneNumber(userSignUpDTO.getPhoneNumber())
+                .build();
+
+        // @formatter:on
+        
         Account account = new Account();
         account = accountDAO.save(account);
 

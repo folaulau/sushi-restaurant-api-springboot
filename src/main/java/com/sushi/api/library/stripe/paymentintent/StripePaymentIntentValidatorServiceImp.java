@@ -28,7 +28,7 @@ import com.sushi.api.entity.user.User;
 import com.sushi.api.entity.user.UserDAO;
 import com.sushi.api.exception.ApiError;
 import com.sushi.api.exception.ApiException;
-import com.sushi.api.library.aws.secretsmanager.StripeSecrets;
+import com.sushi.api.library.aws.parameterstore.StripeSecrets;
 import com.sushi.api.utils.ApiSessionUtils;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,4 +1,4 @@
-package com.sushi.api.library.aws.secretsmanager;
+package com.sushi.api.library.aws.parameterstore;
 
 import java.io.IOException;
 import java.io.Serializable;

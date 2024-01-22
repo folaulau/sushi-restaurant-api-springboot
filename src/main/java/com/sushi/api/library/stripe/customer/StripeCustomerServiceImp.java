@@ -14,7 +14,8 @@ import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.CustomerUpdateParams;
 import com.sushi.api.entity.address.Address;
 import com.sushi.api.entity.user.User;
-import com.sushi.api.library.aws.secretsmanager.StripeSecrets;
+import com.sushi.api.library.aws.parameterstore.StripeSecrets;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**

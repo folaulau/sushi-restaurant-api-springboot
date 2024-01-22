@@ -56,152 +56,142 @@ import lombok.Setter;
 @JsonInclude(value = Include.NON_NULL)
 @DynamicUpdate
 @Entity
-@SQLDelete(sql = "UPDATE " + DatabaseTableNames.USER + " SET deleted = 'T' WHERE id = ?",
-    check = ResultCheckStyle.NONE)
+@SQLDelete(sql = "UPDATE " + DatabaseTableNames.USER + " SET deleted = 'T' WHERE id = ?", check = ResultCheckStyle.NONE)
 @Where(clause = "deleted = 'F'")
-@Table(name = DatabaseTableNames.USER,
-    indexes = {@Index(columnList = "uuid"), @Index(columnList = "deleted")})
+@Table(name = DatabaseTableNames.USER, indexes = {@Index(columnList = "uuid"), @Index(columnList = "deleted")})
 public class User implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id", nullable = false, updatable = false, unique = true)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false, unique = true)
+    private Long              id;
 
-  @Column(name = "uuid", unique = true, nullable = false, updatable = false)
-  private String uuid;
+    @Column(name = "uuid", unique = true, nullable = false, updatable = false)
+    private String            uuid;
 
-  @Column(name = "first_name", nullable = true)
-  private String firstName;
+    @Column(name = "first_name", nullable = true)
+    private String            firstName;
 
-  @Column(name = "last_name", nullable = true)
-  private String lastName;
+    @Column(name = "last_name", nullable = true)
+    private String            lastName;
 
-  @Column(name = "third_party_name")
-  private String thirdPartyName;
+    @Column(name = "email", nullable = false, unique = true)
+    private String            email;
 
-  @Column(name = "email", nullable = false, unique = true)
-  private String email;
+    @Column(name = "password", nullable = false)
+    private String            password;
 
-  @Column(name = "phone_number", nullable = true)
-  private String phoneNumber;
+    @Column(name = "phone_number", nullable = true)
+    private String            phoneNumber;
 
-  @Column(name = "dob", nullable = true)
-  private LocalDate dob;
+    @Column(name = "dob", nullable = true)
+    private LocalDate         dob;
 
-  /**
-   * Social platforms(facebook, google, etc) don't give email<br>
-   * Now create a temp email for now
-   */
-  @Column(name = "email_temp")
-  private boolean emailTemp;
+    @JsonIgnoreProperties(value = {"users"})
+    @JoinColumn(name = "account_id", nullable = false)
+    @ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    private Account           account;
 
-  @JsonIgnoreProperties(value = {"users"})
-  @JoinColumn(name = "account_id", nullable = false)
-  @ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
-  private Account account;
+    @Column(name = "deleted", nullable = false)
+    private boolean           deleted;
 
-  @Column(name = "deleted", nullable = false)
-  private boolean deleted;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime     createdAt;
 
-  @CreationTimestamp
-  @Column(name = "created_at", nullable = false, updatable = false)
-  private LocalDateTime createdAt;
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime     updatedAt;
 
-  @UpdateTimestamp
-  @Column(name = "updated_at", nullable = false)
-  private LocalDateTime updatedAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private UserStatus        status;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "status")
-  private UserStatus status;
+    @JsonIgnoreProperties(value = {"user"})
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
+    private Address           address;
 
-  @JsonIgnoreProperties(value = {"user"})
-  @OneToOne(cascade = CascadeType.ALL, mappedBy = "user")
-  private Address address;
+    @JsonIgnoreProperties(value = {"users"})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_roles", joinColumns = {@JoinColumn(name = "parent_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
+    private Set<Role>         roles;
 
-  @JsonIgnoreProperties(value = {"users"})
-  @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-  @JoinTable(name = "user_roles", joinColumns = {@JoinColumn(name = "parent_id")},
-      inverseJoinColumns = {@JoinColumn(name = "role_id")})
-  private Set<Role> roles;
-
-  public void addRole(Role role) {
-    if (this.roles == null) {
-      this.roles = new HashSet<>();
-    }
-    this.roles.add(role);
-  }
-
-  public String getRoleAsString() {
-    if (this.roles == null) {
-      return null;
-    }
-    return this.roles.stream().findFirst().get().getUserType().name();
-  }
-
-  public boolean isActive() {
-    return Optional.ofNullable(this.status).orElse(UserStatus.NONE).equals(UserStatus.ACTIVE);
-  }
-
-  @Override
-  public int hashCode() {
-    return new HashCodeBuilder(17, 37).append(this.id).append(this.uuid).toHashCode();
-
-    // return HashCodeBuilder.reflectionHashCode(this);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (obj == this) {
-      return true;
-    }
-    if (obj.getClass() != getClass()) {
-      return false;
-    }
-    User other = (User) obj;
-    return new EqualsBuilder().append(this.id, other.id).append(this.uuid, other.uuid).isEquals();
-  }
-
-  @Override
-  public String toString() {
-    // TODO Auto-generated method stub
-    return ToStringBuilder.reflectionToString(this);
-  }
-
-  public String toJson() {
-    return ObjectUtils.toJson(this);
-  }
-
-  @PrePersist
-  private void preCreate() {
-    if (this.uuid == null || this.uuid.isEmpty()) {
-      this.uuid = "user-" + UUID.randomUUID().toString();
+    public void addRole(Role role) {
+        if (this.roles == null) {
+            this.roles = new HashSet<>();
+        }
+        this.roles.add(role);
     }
 
-  }
-
-  public String getFullName() {
-    StringBuilder fullname = new StringBuilder();
-
-    if (this.firstName != null && !this.firstName.isEmpty()) {
-      fullname.append(this.firstName);
+    public String getRoleAsString() {
+        if (this.roles == null) {
+            return null;
+        }
+        return this.roles.stream().findFirst().get().getUserType().name();
     }
 
-    if (this.lastName != null && !this.lastName.isEmpty()) {
-      if (fullname.toString().isEmpty()) {
-        fullname.append(this.lastName);
-      } else {
-        fullname.append(" " + this.lastName);
-      }
+    public boolean isActive() {
+        return Optional.ofNullable(this.status).orElse(UserStatus.NONE).equals(UserStatus.ACTIVE);
     }
 
-    return fullname.toString();
-  }
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(this.id).append(this.uuid).toHashCode();
+
+        // return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        User other = (User) obj;
+        return new EqualsBuilder().append(this.id, other.id).append(this.uuid, other.uuid).isEquals();
+    }
+
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        return ToStringBuilder.reflectionToString(this);
+    }
+
+    public String toJson() {
+        return ObjectUtils.toJson(this);
+    }
+
+    @PrePersist
+    private void preCreate() {
+        if (this.uuid == null || this.uuid.isEmpty()) {
+            this.uuid = "user-" + UUID.randomUUID().toString();
+        }
+
+    }
+
+    public String getFullName() {
+        StringBuilder fullname = new StringBuilder();
+
+        if (this.firstName != null && !this.firstName.isEmpty()) {
+            fullname.append(this.firstName);
+        }
+
+        if (this.lastName != null && !this.lastName.isEmpty()) {
+            if (fullname.toString().isEmpty()) {
+                fullname.append(this.lastName);
+            } else {
+                fullname.append(" " + this.lastName);
+            }
+        }
+
+        return fullname.toString();
+    }
 
 }

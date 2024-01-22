@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sushi.api.dto.AuthenticationResponseDTO;
 import com.sushi.api.dto.AuthenticatorDTO;
 import com.sushi.api.dto.UserDTO;
+import com.sushi.api.dto.UserSignInDTO;
+import com.sushi.api.dto.UserSignUpDTO;
 import com.sushi.api.dto.UserUpdateDTO;
 import com.sushi.api.utils.ObjectUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,42 +29,46 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/users")
 public class UserRestController {
 
-  @Autowired
-  private UserService userService;
+    @Autowired
+    private UserService userService;
 
-  @Operation(summary = "Authenticate", description = "sign up or sign in")
-  @PostMapping(value = "/authenticate")
-  public ResponseEntity<AuthenticationResponseDTO> authenticate(
-      @RequestHeader(name = "x-api-key", required = true) String xApiKey,
-      @RequestBody AuthenticatorDTO authenticatorDTO) {
-    log.info("authenticate={}", ObjectUtils.toJson(authenticatorDTO));
+    @Operation(summary = "Sign Up", description = "sign up")
+    @PostMapping(value = "/signup")
+    public ResponseEntity<AuthenticationResponseDTO> authenticate(@RequestHeader(name = "x-api-key", required = true) String xApiKey, @RequestBody UserSignUpDTO userSignUpDTO) {
+        log.info("userSignUpDTO={}", ObjectUtils.toJson(userSignUpDTO));
 
-    AuthenticationResponseDTO authenticationResponseDTO =
-        userService.authenticate(authenticatorDTO);
+        AuthenticationResponseDTO authenticationResponseDTO = userService.signUp(userSignUpDTO);
 
-    return new ResponseEntity<>(authenticationResponseDTO, OK);
-  }
+        return new ResponseEntity<>(authenticationResponseDTO, OK);
+    }
 
-  @Operation(summary = "Get User Profile")
-  @GetMapping(value = "/{uuid}")
-  public ResponseEntity<UserDTO> getByUuid(
-      @RequestHeader(name = "token", required = true) String token, @PathVariable String uuid) {
-    log.info("getByUuid={}", uuid);
+    @Operation(summary = "Sign In", description = "sign in")
+    @PostMapping(value = "/signin")
+    public ResponseEntity<AuthenticationResponseDTO> authenticate(@RequestHeader(name = "x-api-key", required = true) String xApiKey, @RequestBody UserSignInDTO userSignInDTO) {
+        log.info("userSignInDTO={}", ObjectUtils.toJson(userSignInDTO));
 
-    UserDTO user = userService.getProfile(uuid);
+        AuthenticationResponseDTO authenticationResponseDTO = userService.signIn(userSignInDTO);
 
-    return new ResponseEntity<>(user, OK);
-  }
-  
-  @Operation(summary = "Update User Profile")
-  @PutMapping
-  public ResponseEntity<UserDTO> updateProfile(
-      @RequestHeader(name = "token", required = true) String token,
-      @RequestBody UserUpdateDTO userUpdateDTO) {
-    log.info("updateProfile={}", userUpdateDTO);
+        return new ResponseEntity<>(authenticationResponseDTO, OK);
+    }
 
-    UserDTO user = userService.updateProfle(userUpdateDTO);
+    @Operation(summary = "Get User Profile")
+    @GetMapping(value = "/{uuid}")
+    public ResponseEntity<UserDTO> getByUuid(@RequestHeader(name = "token", required = true) String token, @PathVariable String uuid) {
+        log.info("getByUuid={}", uuid);
 
-    return new ResponseEntity<>(user, OK);
-  }
+        UserDTO user = userService.getProfile(uuid);
+
+        return new ResponseEntity<>(user, OK);
+    }
+
+    @Operation(summary = "Update User Profile")
+    @PutMapping
+    public ResponseEntity<UserDTO> updateProfile(@RequestHeader(name = "token", required = true) String token, @RequestBody UserUpdateDTO userUpdateDTO) {
+        log.info("updateProfile={}", userUpdateDTO);
+
+        UserDTO user = userService.updateProfle(userUpdateDTO);
+
+        return new ResponseEntity<>(user, OK);
+    }
 }

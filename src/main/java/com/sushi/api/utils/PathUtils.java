@@ -23,7 +23,7 @@ public final class PathUtils {
       "/webjars/springfox-swagger-ui/springfox.css?v=2.8.0-SNAPSHOT",
       "/webjars/springfox-swagger-ui/swagger-ui.css?v=2.8.0-SNAPSHOT"};
 
-  public static final String[] LOGIN_URLS = {"/users/authenticate"};
+  public static final String[] LOGIN_URLS = {"/users/signup","/users/signin"};
   public static final String[] LOGOUT_URLS = {"/logout"};
 
 }

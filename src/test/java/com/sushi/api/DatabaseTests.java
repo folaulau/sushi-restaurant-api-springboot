@@ -11,6 +11,7 @@ import com.sushi.api.entity.account.AccountDAO;
 import com.sushi.api.entity.user.User;
 import com.sushi.api.entity.user.UserDAO;
 import com.sushi.api.utils.ObjectUtils;
+import com.sushi.api.utils.PasswordUtils;
 import com.sushi.api.utils.RandomGeneratorUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,6 +52,8 @@ public class DatabaseTests extends IntegrationTestConfiguration {
 
     user.setPhoneNumber("310" + RandomGeneratorUtils.getIntegerWithin(100, 999) + ""
         + RandomGeneratorUtils.getIntegerWithin(1000, 9999));
+    
+    user.setPassword(PasswordUtils.hashPassword("Test1234!"));
 
     user = userDAO.save(user);
 

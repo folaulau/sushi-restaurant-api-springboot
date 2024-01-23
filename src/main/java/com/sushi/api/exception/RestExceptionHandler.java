@@ -5,17 +5,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.PersistenceException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.TransientPropertyValueException;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -33,11 +31,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+
+import jakarta.persistence.PersistenceException;
 import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
 @Slf4j
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
 
     /**
      * 
@@ -63,29 +64,30 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(ex.getError(), httpStatus);
     }
 
-//    /**
-//     * Access Denied Exception
-//     * 
-//     * @param ex
-//     * @return
-//     */
-//    @ExceptionHandler(AccessDeniedException.class)
-//    protected ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException ex) {
-//        log.info("handleAccessDeniedException(..)");
-//        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "You do not have access to this api.", null, Collections.singletonList(ex.getLocalizedMessage()));
-//
-//        log.debug("Friendly Msg: {}", apiError.getMessage());
-//        String errors = StringUtils.join(apiError.getErrors(), ",");
-//        log.debug("API response detailed message: {}", errors);
-//
-//        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-//
-//        if (null != apiError.getStatus()) {
-//            httpStatus = apiError.getStatus();
-//        }
-//
-//        return new ResponseEntity<>(apiError, httpStatus);
-//    }
+    // /**
+    // * Access Denied Exception
+    // *
+    // * @param ex
+    // * @return
+    // */
+    // @ExceptionHandler(AccessDeniedException.class)
+    // protected ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException ex) {
+    // log.info("handleAccessDeniedException(..)");
+    // ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, "You do not have access to this api.", null,
+    // Collections.singletonList(ex.getLocalizedMessage()));
+    //
+    // log.debug("Friendly Msg: {}", apiError.getMessage());
+    // String errors = StringUtils.join(apiError.getErrors(), ",");
+    // log.debug("API response detailed message: {}", errors);
+    //
+    // HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+    //
+    // if (null != apiError.getStatus()) {
+    // httpStatus = apiError.getStatus();
+    // }
+    //
+    // return new ResponseEntity<>(apiError, httpStatus);
+    // }
 
     /**
      * Fall back exception handler - if all fails, I WILL CATCH YOU!
@@ -179,34 +181,27 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleMissingServletRequestParameter(..)");
         return super.handleMissingServletRequestParameter(ex, headers, status, request);
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleMissingServletRequestPart(..)");
         return super.handleMissingServletRequestPart(ex, headers, status, request);
     }
 
     @Override
-    protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleConversionNotSupported(..)");
         return super.handleConversionNotSupported(ex, headers, status, request);
     }
 
     @Override
-    protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleServletRequestBindingException(..)");
         return super.handleServletRequestBindingException(ex, headers, status, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        log.info("handleBindException(..)");
-        return super.handleBindException(ex, headers, status, request);
-
     }
 
     /**
@@ -230,7 +225,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleHttpMediaTypeNotAcceptable(..)");
         String errorMessage = null != ex.getLocalizedMessage() ? ex.getLocalizedMessage() : ApiError.DEFAULT_MSG;
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ApiError.DEFAULT_MSG, errorMessage, Collections.singletonList(errorMessage));
@@ -238,7 +233,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleHttpMediaTypeNotAcceptable(..)");
         String errorMessage = null != ex.getLocalizedMessage() ? ex.getLocalizedMessage() : ApiError.DEFAULT_MSG;
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ApiError.DEFAULT_MSG, errorMessage, Collections.singletonList(errorMessage));
@@ -246,7 +241,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleExceptionInternal(..)");
         String errorMessage = null != ex.getLocalizedMessage() ? ex.getLocalizedMessage() : ApiError.DEFAULT_MSG;
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ApiError.DEFAULT_MSG, errorMessage, Collections.singletonList(errorMessage));
@@ -254,15 +249,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error("handleHttpMessageNotReadable(..)", ex);
         String errorMessage = null != ex.getLocalizedMessage() ? ex.getLocalizedMessage() : ApiError.DEFAULT_MSG;
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ApiError.DEFAULT_MSG, errorMessage, Arrays.asList("Invalid request/payload", "Check your request and make you pass in the right data type for each field. Check if you are passing in an enum in a mal-formatted way.", ex.getLocalizedMessage()));
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ApiError.DEFAULT_MSG, errorMessage, Arrays.asList("Invalid request/payload",
+                "Check your request and make you pass in the right data type for each field. Check if you are passing in an enum in a mal-formatted way.", ex.getLocalizedMessage()));
         return new ResponseEntity<>(apiError, status);
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleHttpMediaTypeNotSupported(..)");
         log.error(ex.getMessage());
         String errorMessage = null != ex.getLocalizedMessage() ? ex.getLocalizedMessage() : ApiError.DEFAULT_MSG;
@@ -271,7 +267,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.debug("handleMethodArgumentNotValid(..)");
 
         List<ApiSubError> errors = getFormErrors(ex.getBindingResult());
@@ -283,7 +279,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleMissingPathVariable(..)");
         log.error(ex.getMessage());
         String errorMessage = null != ex.getLocalizedMessage() ? ex.getLocalizedMessage() : ApiError.DEFAULT_MSG;
@@ -292,7 +288,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleHttpRequestMethodNotSupported(..)");
         log.error(ex.getMessage());
         String errorMessage = null != ex.getLocalizedMessage() ? ex.getLocalizedMessage() : ApiError.DEFAULT_MSG;
@@ -301,7 +297,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.info("handleTypeMismatch(..)");
         log.error(ex.getMessage());
         String errorMessage = null != ex.getLocalizedMessage() ? ex.getLocalizedMessage() : ApiError.DEFAULT_MSG;
@@ -331,5 +327,4 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         }).collect(Collectors.toList());
         return errors;
     }
-
 }

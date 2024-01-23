@@ -2,7 +2,7 @@ package com.sushi.api.dto;
 
 import java.io.Serializable;
 import java.util.Set;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.sushi.api.entity.order.DeliveryMethod;

@@ -3,15 +3,15 @@ package com.sushi.api.entity.payment;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.ResultCheckStyle;
@@ -38,9 +38,9 @@ import lombok.Setter;
 @JsonInclude(value = Include.NON_NULL)
 @DynamicUpdate
 @Entity
-@SQLDelete(sql = "UPDATE " + DatabaseTableNames.PAYMENT + " SET deleted = 'T' WHERE id = ?",
+@SQLDelete(sql = "UPDATE " + DatabaseTableNames.PAYMENT + " SET deleted = true WHERE id = ?",
     check = ResultCheckStyle.NONE)
-@Where(clause = "deleted = 'F'")
+@Where(clause = "deleted = false")
 @Table(name = DatabaseTableNames.PAYMENT,
     indexes = {@Index(columnList = "uuid"), @Index(columnList = "deleted")})
 public class Payment implements Serializable {
@@ -62,9 +62,8 @@ public class Payment implements Serializable {
   @Column(name = "order_id")
   private Long orderId;
 
-  @Type(type = "true_false")
   @Column(name = "paid")
-  private Boolean paid;
+  private boolean paid;
 
   @Column(name = "description")
   private String description;
@@ -78,7 +77,6 @@ public class Payment implements Serializable {
   @Embedded
   private OrderPaymentMethod paymentMethod;
 
-  @Type(type = "true_false")
   @Column(name = "deleted", nullable = false)
   private boolean deleted;
 

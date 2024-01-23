@@ -1,9 +1,6 @@
 package com.sushi.api.entity.order;
 
-import java.util.List;
-import javax.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import jakarta.validation.Valid;
 import com.sushi.api.dto.OrderConfirmDTO;
 import com.sushi.api.dto.OrderDTO;
 import com.sushi.api.dto.OrderRemoveRequestDTO;

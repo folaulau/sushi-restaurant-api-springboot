@@ -2,15 +2,15 @@ package com.sushi.api.entity.product;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.ResultCheckStyle;
@@ -35,9 +35,9 @@ import lombok.Setter;
 @JsonInclude(value = Include.NON_NULL)
 @DynamicUpdate
 @Entity
-@SQLDelete(sql = "UPDATE " + DatabaseTableNames.PRODUCT + " SET deleted = 'T' WHERE id = ?",
+@SQLDelete(sql = "UPDATE " + DatabaseTableNames.PRODUCT + " SET deleted = true WHERE id = ?",
     check = ResultCheckStyle.NONE)
-@Where(clause = "deleted = 'F'")
+@Where(clause = "deleted = false")
 @Table(name = DatabaseTableNames.PRODUCT,
     indexes = {@Index(columnList = "uuid"), @Index(columnList = "deleted")})
 public class Product implements Serializable {

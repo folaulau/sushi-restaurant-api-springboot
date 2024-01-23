@@ -2,15 +2,10 @@ package com.sushi.api.dto;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import javax.persistence.Column;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.sushi.api.entity.address.Address;
 import com.sushi.api.entity.order.DeliveryMethod;
 import com.sushi.api.entity.order.OrderStatus;
 import lombok.AllArgsConstructor;

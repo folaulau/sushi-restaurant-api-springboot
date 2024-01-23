@@ -2,8 +2,6 @@ package com.sushi.api.dto;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 

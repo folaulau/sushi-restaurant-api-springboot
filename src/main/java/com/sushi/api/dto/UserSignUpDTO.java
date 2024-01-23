@@ -1,9 +1,6 @@
 package com.sushi.api.dto;
 
 import java.io.Serializable;
-
-import javax.validation.constraints.NotNull;
-
 import com.sushi.api.validators.Email;
 import com.sushi.api.validators.Password;
 import com.sushi.api.validators.USPhoneNumber;

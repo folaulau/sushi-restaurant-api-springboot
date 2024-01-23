@@ -41,6 +41,8 @@ public class LiveAppConfig {
         String password = databaseSecrets.getPassword();
         String url = "jdbc:postgresql://" + host + ":" + port + "/" + databaseName;
 
+        log.info("database url={}", url);
+
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(url);
         config.setUsername(username);

@@ -40,15 +40,6 @@ public class GithubAppConfig {
     @Value("${spring.datasource.name}")
     private String                   databaseName;
 
-    @Value("${aws.access.key}")
-    private String                   awsAccessKey;
-
-    @Value("${aws.secret.key}")
-    private String                   awsSecretKey;
-
-    @Value("${firebase.web.api.key}")
-    private String                   firebaseWebApiKey;
-
     @Autowired
     private AwsParameterStoreService awsParameterStoreService;
 
@@ -68,7 +59,9 @@ public class GithubAppConfig {
 
     @Bean(name = "xApiKey")
     public XApiKey xApiKeySecrets() {
-        return null;
+        return XApiKey.builder()
+                .webXApiKey("uuid-sdfh-2342ssd-sdf323")
+                .build();
     }
 
     @Bean(name = "stripeSecrets")
@@ -77,7 +70,6 @@ public class GithubAppConfig {
     }
 
     /* ================== datasource =============== */
-    @DependsOn("amazonAWSCredentialsProvider")
     @Bean
     public HikariDataSource dataSource() {
         log.info("Configuring dataSource...");

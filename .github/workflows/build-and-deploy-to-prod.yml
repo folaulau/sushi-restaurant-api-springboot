@@ -47,8 +47,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region: us-west-2
           mask-aws-account-id: 'no'
 
@@ -78,10 +78,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     env:
-      ECS_CLUSTER: trader-api
-      ECS_SERVICE: my-trader-api-paper-service
-      CONTAINER_NAME: my-trader-api-paper-container
-      TASK_DEFINITION: my-trader-api-paper
+      ECS_CLUSTER: pocsoft
+      ECS_SERVICE: sushi-api
+      CONTAINER_NAME: sushi-api-container
+      TASK_DEFINITION: sushi-api-task
 
     # https://github.com/aws-actions/amazon-ecs-deploy-task-definition
     # https://aws.amazon.com/blogs/containers/create-a-ci-cd-pipeline-for-amazon-ecs-with-github-actions-and-aws-codebuild-tests/
@@ -98,8 +98,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-2
           mask-aws-account-id: 'no'
 

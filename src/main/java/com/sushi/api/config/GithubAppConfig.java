@@ -63,7 +63,7 @@ public class GithubAppConfig {
 
     @Bean
     public AmazonSimpleEmailService amazonSES(AWSCredentialsProvider amazonAWSCredentialsProvider) {
-        return AmazonSimpleEmailServiceClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider).withRegion(Regions.US_WEST_2).build();
+        return AmazonSimpleEmailServiceClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider).withRegion(getTargetRegion()).build();
     }
 
     @Bean(name = "xApiKey")
@@ -107,10 +107,5 @@ public class GithubAppConfig {
         log.info("DataSource configured!");
 
         return hds;
-    }
-
-    @Bean(name = "queue")
-    public String queue(@Value("${queue}") String queue) {
-        return queue;
     }
 }

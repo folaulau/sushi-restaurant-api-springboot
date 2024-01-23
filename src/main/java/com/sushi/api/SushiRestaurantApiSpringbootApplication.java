@@ -57,19 +57,6 @@ public class SushiRestaurantApiSpringbootApplication implements CommandLineRunne
                 System.out.println("** TimeStamp: " + new Date().toInstant().toString());
                 if (Arrays.toString(env.getActiveProfiles()).equals("[local]")) {
 
-                    // System.out.println("** Internal Url: http://" + env.getProperty("project.host") + ":"
-                    // + env.getProperty("server.port") + env.getProperty("server.servlet.context-path"));
-                    // System.out.println("** External Url: http://"
-                    // + InetAddress.getLocalHost().getHostAddress() + ":" + env.getProperty("server.port")
-                    // + env.getProperty("server.servlet.context-path"));
-                    //
-                    // System.out.println("** Internal Swagger: http://" + env.getProperty("project.host") + ":"
-                    // + env.getProperty("server.port") + env.getProperty("server.servlet.context-path")
-                    // + "/swagger-ui.html");
-                    // System.out.println("** External Swagger: http://"
-                    // + InetAddress.getLocalHost().getHostAddress() + ":" + env.getProperty("server.port")
-                    // + env.getProperty("server.servlet.context-path") + "/swagger-ui.html");
-
                     System.out.println("** Internal Url: http://" + env.getProperty("project.host") + ":" + env.getProperty("server.port") + env.getProperty("server.servlet.context-path"));
                     System.out
                             .println("** External Url: http://" + InetAddress.getLocalHost().getHostAddress() + ":" + env.getProperty("server.port") + env.getProperty("server.servlet.context-path"));
@@ -80,10 +67,6 @@ public class SushiRestaurantApiSpringbootApplication implements CommandLineRunne
                             + env.getProperty("server.servlet.context-path") + "/swagger-ui/index.html");
 
                 } else {
-                    // System.out.println("** External Url: https://" + env.getProperty("project.host")
-                    // + env.getProperty("server.servlet.context-path"));
-                    // System.out.println("** External Swagger: https://" + env.getProperty("project.host")
-                    // + env.getProperty("server.servlet.context-path") + "/swagger-ui.html");
 
                     System.out.println("** External Url: https://" + env.getProperty("project.host") + env.getProperty("server.servlet.context-path"));
                     System.out.println("** External Swagger: https://" + env.getProperty("project.host") + env.getProperty("server.servlet.context-path") + "/swagger-ui/index.html");

@@ -16,7 +16,7 @@ import com.sushi.api.utils.RandomGeneratorUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Profile(value = {"local"})
+@Profile(value = {"local", "prod", "github"})
 @Component
 public class AccountDataLoader implements ApplicationRunner {
 

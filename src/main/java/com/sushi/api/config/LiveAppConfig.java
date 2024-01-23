@@ -20,9 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class LiveAppConfig {
 
-    @Value("${aws.deploy.region:us-west-2}")
-    private String                   targetRegion;
-
     @Value("${spring.datasource.name}")
     private String                   databaseName;
 
@@ -72,19 +69,11 @@ public class LiveAppConfig {
         return awsParameterStoreService.getStripeSecrets();
     }
 
-    // @Bean(name = "twilioSecrets")
-    // public TwilioSecrets twilioSecrets() {
-    // return awsSecretsManagerService.getTwilioSecrets();
-    // }
-
-    @Bean(name = "queue")
-    public String queue(@Value("${queue}") String queue) {
-        return queue;
-    }
-
     @Bean(name = "xApiKey")
     public XApiKey xApiKeySecrets() {
-        return null;
+        return XApiKey.builder()
+                .webXApiKey("uuid-12kjsd-jsoi322-lskll")
+                .build();
     }
 
 }

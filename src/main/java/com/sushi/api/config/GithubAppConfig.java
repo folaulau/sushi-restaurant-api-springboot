@@ -43,20 +43,6 @@ public class GithubAppConfig {
     @Autowired
     private AwsParameterStoreService awsParameterStoreService;
 
-    private Regions getTargetRegion() {
-        return Regions.fromName(targetRegion);
-    }
-
-    @Bean
-    public AmazonS3 amazonS3(AWSCredentialsProvider amazonAWSCredentialsProvider) {
-        return AmazonS3ClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider).withRegion(getTargetRegion()).build();
-    }
-
-    @Bean
-    public AmazonSimpleEmailService amazonSES(AWSCredentialsProvider amazonAWSCredentialsProvider) {
-        return AmazonSimpleEmailServiceClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider).withRegion(getTargetRegion()).build();
-    }
-
     @Bean(name = "xApiKey")
     public XApiKey xApiKeySecrets() {
         return XApiKey.builder()

@@ -42,7 +42,7 @@ jobs:
 
       - name: Build with maven
         run: |
-          mvn -Daws.access.key=${{ secrets.AWS_ACCESS_KEY }} -Daws.secret.key=${{ secrets.AWS_SECRET_KEY }} -Dspring.profiles.active=${{ env.ACTIVE_ENV }} -Dtest.env=github clean package
+          mvn -Daws.access.key=${{ secrets.AWS_ACCESS_KEY_ID }} -Daws.secret.key=${{ secrets.AWS_SECRET_ACCESS_KEY }} -Dspring.profiles.active=github -Dtest.env=github clean package
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -60,7 +60,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: my-trader-api-paper
+          ECR_REPOSITORY: sushi-api
         run: |
           IMAGE_TAG=${GITHUB_REF##*/}-$(echo $GITHUB_SHA | cut -c 1-7)        
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REPOSITORY:latest .
@@ -74,8 +74,8 @@ jobs:
   deploy-into-ecs:
     runs-on: ubuntu-latest
     needs: push-to-ecr
-    environment: paper-env
-    if: github.ref == 'refs/heads/paper'
+    environment: prod-env
+    if: github.ref == 'refs/heads/main'
 
     env:
       ECS_CLUSTER: trader-api

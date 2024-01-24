@@ -1,11 +1,11 @@
-package com.sushi.api.entity.server_activity;
+package com.sushi.api.security.serveractivity;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-import org.springframework.jdbc.core.JdbcTemplate;
-import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @Slf4j
@@ -24,6 +24,11 @@ public class ServerActivityDAOImp implements ServerActivityDAO {
   }
 
   @Override
+  public ServerActivity save(ServerActivity serverActivity) {
+    return serverActivityRepository.saveAndFlush(serverActivity);
+  }
+
+  @Override
   public LocalDateTime getLastActivityTimestamp() {
 
     StringBuilder query =
@@ -35,6 +40,11 @@ public class ServerActivityDAOImp implements ServerActivityDAO {
     } catch (Exception e) {
     }
     return lastActivityTimestamp;
+  }
+
+  @Override
+  public ServerActivity getLastActivity() {
+    return serverActivityRepository.findTopByOrderByIdDesc();
   }
 
 

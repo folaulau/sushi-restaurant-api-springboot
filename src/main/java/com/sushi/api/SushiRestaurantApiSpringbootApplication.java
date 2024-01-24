@@ -16,8 +16,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import com.sushi.api.entity.server_activity.ServerActivity;
-import com.sushi.api.entity.server_activity.ServerActivityDAO;
+
+import com.sushi.api.security.serveractivity.ServerActivity;
+import com.sushi.api.security.serveractivity.ServerActivityDAO;
 
 @SpringBootApplication
 public class SushiRestaurantApiSpringbootApplication implements CommandLineRunner {

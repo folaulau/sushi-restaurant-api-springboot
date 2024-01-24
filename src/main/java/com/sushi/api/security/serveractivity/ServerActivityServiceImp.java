@@ -69,7 +69,9 @@ public class ServerActivityServiceImp implements ServerActivityService{
             }
 
             data.put("createdAt", serverActivity.getCreatedAt());
+            data.put("latestApp", "sushi");
             data.put("sushi", serverActivity);
+            
             String json = mapper.writeValueAsString(data);
 
 

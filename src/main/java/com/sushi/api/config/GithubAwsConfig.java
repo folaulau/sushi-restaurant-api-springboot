@@ -1,5 +1,7 @@
 package com.sushi.api.config;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +51,11 @@ public class GithubAwsConfig {
         return new AWSStaticCredentialsProvider(new BasicAWSCredentials(awsAccessKey, awsSecretkey));
 
         // return DefaultAWSCredentialsProviderChain.getInstance();
+    }
+    
+    @Bean
+    public AmazonS3 amazonS3(AWSCredentialsProvider awsCredentialsProvider) {
+        return AmazonS3ClientBuilder.standard().withCredentials(awsCredentialsProvider).withRegion(getTargetRegion()).build();
     }
 
     @Bean

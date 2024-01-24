@@ -9,10 +9,9 @@ public interface AwsS3Service {
 
     AwsUploadResponse uploadPublicObj(String objectKey, ObjectMetadata metadata, InputStream speechStream);
 
+    AwsUploadResponse uploadToRootFolder(String objectKey, ObjectMetadata metadata, InputStream speechStream);
 
-    AwsUploadResponse uploadPublicObj(String s3Bucket, String objectKey, ObjectMetadata metadata, InputStream speechStream);
-
-    AwsUploadResponse uploadPrivateObj(String objectKey, ObjectMetadata metadata, InputStream speechStream);
+//    AwsUploadResponse uploadPrivateObj(String objectKey, ObjectMetadata metadata, InputStream speechStream);
 
     public File downloadFile(String s3Bucket, String key);
 

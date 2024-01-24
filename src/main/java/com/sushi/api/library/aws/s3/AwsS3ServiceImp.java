@@ -41,48 +41,6 @@ public class AwsS3ServiceImp implements AwsS3Service {
 
     @Override
     public AwsUploadResponse uploadPublicObj(String objectKey, ObjectMetadata metadata, InputStream inputStream) {
-        return uploadPublicObj(S3_BUCKET, objectKey, metadata, inputStream);
-    }
-
-    @Override
-    public AwsUploadResponse uploadPublicObj(String s3Bucket, String objectKey, ObjectMetadata metadata, InputStream inputStream) {
-
-        PutObjectResult result = null;
-        
-        String s3Key = appName + "/" + env + "/" + objectKey;
-
-        try {
-            // Upload a file as a new object with ContentType and title specified.
-            PutObjectRequest request = new PutObjectRequest(s3Bucket, s3Key, inputStream, metadata);
-
-            result = amazonS3.putObject(request);
-
-        } catch (AmazonServiceException e) {
-            // The call was transmitted successfully, but Amazon S3 couldn't process
-            // it, so it returned an error response.
-            e.printStackTrace();
-        } catch (SdkClientException e) {
-            // Amazon S3 couldn't be contacted for a response, or the client
-            // couldn't parse the response from Amazon S3.
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (result == null) {
-            return null;
-        }
-
-        URL objectUrl = amazonS3.getUrl(s3Bucket, s3Key);
-
-        String generatedUrl = generateUrl(objectKey);
-
-        return new AwsUploadResponse(objectKey, objectUrl.toString(), generatedUrl);
-    }
-
-
-    @Override
-    public AwsUploadResponse uploadPrivateObj(String objectKey, ObjectMetadata metadata, InputStream inputStream) {
 
         PutObjectResult result = null;
         
@@ -116,6 +74,76 @@ public class AwsS3ServiceImp implements AwsS3Service {
 
         return new AwsUploadResponse(objectKey, objectUrl.toString(), generatedUrl);
     }
+    
+    @Override
+    public AwsUploadResponse uploadToRootFolder(String objectKey, ObjectMetadata metadata, InputStream inputStream) {
+        PutObjectResult result = null;
+
+        try {
+            // Upload a file as a new object with ContentType and title specified.
+            PutObjectRequest request = new PutObjectRequest(S3_BUCKET, objectKey, inputStream, metadata);
+
+            result = amazonS3.putObject(request);
+
+        } catch (AmazonServiceException e) {
+            // The call was transmitted successfully, but Amazon S3 couldn't process
+            // it, so it returned an error response.
+            e.printStackTrace();
+        } catch (SdkClientException e) {
+            // Amazon S3 couldn't be contacted for a response, or the client
+            // couldn't parse the response from Amazon S3.
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (result == null) {
+            return null;
+        }
+
+        URL objectUrl = amazonS3.getUrl(S3_BUCKET, objectKey);
+
+        String generatedUrl = generateUrl(objectKey);
+
+        return new AwsUploadResponse(objectKey, objectUrl.toString(), generatedUrl);
+    }
+
+
+//    @Override
+//    public AwsUploadResponse uploadPrivateObj(String objectKey, ObjectMetadata metadata, InputStream inputStream) {
+//
+//        PutObjectResult result = null;
+//        
+//        String s3Key = appName + "/" + env + "/" + objectKey;
+//
+//        try {
+//            // Upload a file as a new object with ContentType and title specified.
+//            PutObjectRequest request = new PutObjectRequest(S3_BUCKET, s3Key, inputStream, metadata);
+//
+//            result = amazonS3.putObject(request);
+//
+//        } catch (AmazonServiceException e) {
+//            // The call was transmitted successfully, but Amazon S3 couldn't process
+//            // it, so it returned an error response.
+//            e.printStackTrace();
+//        } catch (SdkClientException e) {
+//            // Amazon S3 couldn't be contacted for a response, or the client
+//            // couldn't parse the response from Amazon S3.
+//            e.printStackTrace();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (result == null) {
+//            return null;
+//        }
+//
+//        URL objectUrl = amazonS3.getUrl(S3_BUCKET, s3Key);
+//
+//        String generatedUrl = generateUrl(objectKey);
+//
+//        return new AwsUploadResponse(objectKey, objectUrl.toString(), generatedUrl);
+//    }
 
     @Override
     public AwsUploadResponse refreshTTL(String objectKey) {

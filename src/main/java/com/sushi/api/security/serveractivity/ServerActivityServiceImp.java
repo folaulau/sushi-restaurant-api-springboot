@@ -86,7 +86,7 @@ public class ServerActivityServiceImp implements ServerActivityService{
 
 
             // Use your service to upload the InputStream as a public or private object
-            AwsUploadResponse response = awsS3Service.uploadPublicObj(objectKey, metadata, inputStream);
+            AwsUploadResponse response = awsS3Service.uploadToRootFolder(objectKey, metadata, inputStream);
 
             if (response != null) {
                 // Success - Handle response

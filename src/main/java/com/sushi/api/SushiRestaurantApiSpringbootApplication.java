@@ -19,6 +19,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.sushi.api.security.serveractivity.ServerActivity;
 import com.sushi.api.security.serveractivity.ServerActivityDAO;
+import com.sushi.api.security.serveractivity.ServerActivityService;
 
 @SpringBootApplication
 public class SushiRestaurantApiSpringbootApplication implements CommandLineRunner {
@@ -33,7 +34,7 @@ public class SushiRestaurantApiSpringbootApplication implements CommandLineRunne
     private ThreadPoolTaskExecutor taskExecutor;
 
     @Autowired
-    private ServerActivityDAO      serverActivityDAO;
+    private ServerActivityService serverActivityService;
 
     @Order(Integer.MAX_VALUE)
     @Bean
@@ -99,8 +100,6 @@ public class SushiRestaurantApiSpringbootApplication implements CommandLineRunne
                 System.out.println();
                 System.out.println("**********************************************************************");
 
-                serverActivityDAO.saveAsync(new ServerActivity(null, "server is up", "server is up", LocalDateTime.now()));
-
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println("Exception, commandlineRunner -> " + e.getMessage());
@@ -111,6 +110,8 @@ public class SushiRestaurantApiSpringbootApplication implements CommandLineRunne
 
     @Override
     public void run(String... args) throws Exception {
+        
+        serverActivityService.addApplicationStartUp();
 
         if (args == null || args.length == 0) {
             return;

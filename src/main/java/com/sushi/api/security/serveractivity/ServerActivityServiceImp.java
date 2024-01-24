@@ -34,9 +34,6 @@ public class ServerActivityServiceImp implements ServerActivityService{
     @Autowired
     private Environment environment;
 
-    @Value("${pocsoft.aws.s3.db.bucket}")
-    private String   pocsoftAwsS3DbBucket;
-
     @Async
     @Override
     public void addApplicationStartUp() {
@@ -54,7 +51,7 @@ public class ServerActivityServiceImp implements ServerActivityService{
 
         String objectKey = "db_last_activity_"+env+".json";
 
-        File jsonFile = awsS3Service.downloadFile(pocsoftAwsS3DbBucket,objectKey);
+        File jsonFile = awsS3Service.downloadFile(objectKey);
 
         try {
 
@@ -89,7 +86,7 @@ public class ServerActivityServiceImp implements ServerActivityService{
 
 
             // Use your service to upload the InputStream as a public or private object
-            AwsUploadResponse response = awsS3Service.uploadPublicObj(pocsoftAwsS3DbBucket, objectKey, metadata, inputStream);
+            AwsUploadResponse response = awsS3Service.uploadPublicObj(objectKey, metadata, inputStream);
 
             if (response != null) {
                 // Success - Handle response

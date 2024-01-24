@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -25,9 +26,15 @@ public class AwsS3ServiceImp implements AwsS3Service {
 
     @Value("${aws.s3.bucket}")
     private String S3_BUCKET;
+    
+    @Value("${spring.application.name}")
+    private String appName;
 
     @Value("${aws.deploy.region:us-west-2}")
     private String awsRegion;
+    
+    @Value("${spring.profiles.active}")
+    private String env;
 
     @Autowired
     private AmazonS3 amazonS3;
@@ -41,10 +48,12 @@ public class AwsS3ServiceImp implements AwsS3Service {
     public AwsUploadResponse uploadPublicObj(String s3Bucket, String objectKey, ObjectMetadata metadata, InputStream inputStream) {
 
         PutObjectResult result = null;
+        
+        String s3Key = appName + "/" + env + "/" + objectKey;
 
         try {
             // Upload a file as a new object with ContentType and title specified.
-            PutObjectRequest request = new PutObjectRequest(s3Bucket, objectKey, inputStream, metadata);
+            PutObjectRequest request = new PutObjectRequest(s3Bucket, s3Key, inputStream, metadata);
 
             result = amazonS3.putObject(request);
 
@@ -64,7 +73,7 @@ public class AwsS3ServiceImp implements AwsS3Service {
             return null;
         }
 
-        URL objectUrl = amazonS3.getUrl(s3Bucket, objectKey);
+        URL objectUrl = amazonS3.getUrl(s3Bucket, s3Key);
 
         String generatedUrl = generateUrl(objectKey);
 
@@ -76,10 +85,12 @@ public class AwsS3ServiceImp implements AwsS3Service {
     public AwsUploadResponse uploadPrivateObj(String objectKey, ObjectMetadata metadata, InputStream inputStream) {
 
         PutObjectResult result = null;
+        
+        String s3Key = appName + "/" + env + "/" + objectKey;
 
         try {
             // Upload a file as a new object with ContentType and title specified.
-            PutObjectRequest request = new PutObjectRequest(S3_BUCKET, objectKey, inputStream, metadata);
+            PutObjectRequest request = new PutObjectRequest(S3_BUCKET, s3Key, inputStream, metadata);
 
             result = amazonS3.putObject(request);
 
@@ -99,7 +110,7 @@ public class AwsS3ServiceImp implements AwsS3Service {
             return null;
         }
 
-        URL objectUrl = amazonS3.getUrl(S3_BUCKET, objectKey);
+        URL objectUrl = amazonS3.getUrl(S3_BUCKET, s3Key);
 
         String generatedUrl = generateUrl(objectKey);
 

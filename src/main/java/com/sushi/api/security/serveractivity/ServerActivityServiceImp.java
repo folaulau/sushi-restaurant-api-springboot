@@ -99,6 +99,15 @@ public class ServerActivityServiceImp implements ServerActivityService{
         } catch (Exception e) {
             log.warn("Exception, msg={}",e.getLocalizedMessage());
         }
+        
+        if(jsonFile!=null) {
+            try {
+                jsonFile.delete();
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+            
+        }
 
     }
 }

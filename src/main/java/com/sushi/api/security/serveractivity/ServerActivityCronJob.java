@@ -16,7 +16,7 @@ public class ServerActivityCronJob {
     @Autowired
     private ServerActivityService serverActivityService;
 
-    @Scheduled(fixedRate = CronJobRate.MINUTE * 2) // 300000 milliseconds is 5 minutes
+    @Scheduled(fixedRate = CronJobRate.MINUTE * 5) // 300000 milliseconds is 5 minutes
     public void addLastActivityToS3() {
 
         ServerActivity lastActivity = serverActivityDAO.getLastActivity();

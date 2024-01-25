@@ -168,12 +168,12 @@ jobs:
 
       - name: Clear Hasura Metadata
         run: |
-          hasura metadata clear --endpoint https://sushi-graphql.pocsoft.com --admin-secret sushi --project hasura
+          hasura metadata clear --endpoint https://sushi-graphql.pocsoft.com --admin-secret ${{ secrets.HASURA_ADMIN_SECRET }} --project hasura
 
       - name: Apply Hasura Metadata
         if: always()
         run: |
-          hasura metadata apply --endpoint https://sushi-graphql.pocsoft.com --admin-secret sushi --project hasura
+          hasura metadata apply --endpoint https://sushi-graphql.pocsoft.com --admin-secret ${{ secrets.HASURA_ADMIN_SECRET }} --project hasura
 
       - name: Remove Github Actions IP from security group
         run: |

@@ -47,7 +47,7 @@ public class ActivityFilter implements Filter {
   @Override
   public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
       throws IOException, ServletException {
-    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+    TimeZone.setDefault(TimeZone.getTimeZone("America/Denver"));
     // log.info("ActivityFilter.doFilter(..)");
     HttpServletResponse response = (HttpServletResponse) resp;
     HttpServletRequest request = (HttpServletRequest) req;

@@ -38,7 +38,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         // log.debug("doFilterInternal(...)");
 
         String clientIpAddress = HttpUtils.getRequestIP(request);
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Denver"));
         String token = request.getHeader("token");
         log.debug("token: {}, ip address", token, clientIpAddress);
         log.debug("url: {}", HttpUtils.getFullURL(request));

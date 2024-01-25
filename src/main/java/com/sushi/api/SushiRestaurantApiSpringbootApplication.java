@@ -25,7 +25,7 @@ import com.sushi.api.security.serveractivity.ServerActivityService;
 public class SushiRestaurantApiSpringbootApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Denver"));
         SpringApplication.run(SushiRestaurantApiSpringbootApplication.class, args);
     }
 

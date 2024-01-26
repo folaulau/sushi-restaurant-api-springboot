@@ -1,31 +1,11 @@
-version: '3.0'
+version: '3.8'
+
 services:
-  elasticsearch:
-    container_name: pooch-es-container
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.3
-    restart: always
-    environment:
-    - xpack.security.enabled=false
-    - discovery.type=single-node
+  hasura-sushi:
+    image: hasura/graphql-engine:v2.34.0
+    container_name: sushi-hasura
     ports:
-    - 9200:9200
-    - 9300:9300
-  kibana:
-    container_name: pooch-kb-container
-    image: docker.elastic.co/kibana/kibana:7.17.3
-    restart: always
-    environment:
-    - ELASTICSEARCH_HOSTS=http://pooch-es-container:9200
-    depends_on:
-    - elasticsearch
-    ports:
-    - 5601:5601
-  redis:
-    container_name: pooch-redis-container
-    image: redis:latest
-    restart: always
-    ports:
-      - '6379:6379'
-networks:
-  es-net:
-    driver: bridge
+      - '7008:8080'
+    restart: unless-stopped
+    env_file:
+      - hasura/hasura-local.env

@@ -14,11 +14,7 @@ read -t 2 -p ""
 
 printf "starting container, docker internal port=$containerInternalPort, public port=$containerPublicPort \n"
 
-docker run -d -p $containerPublicPort:$containerInternalPort \
-	   --name=$appName \
-	   --restart=unless-stopped \
-       --env-file hasura-local.env \
-       $image:$version
+docker-compose up -d
 
 printf "now container is running, docker internal port=$containerInternalPort, public port=$containerPublicPort \n"
 printf "go to http://localhost:$containerPublicPort/console \n"

@@ -86,14 +86,13 @@ public class AwsS3ServiceImp implements AwsS3Service {
             result = amazonS3.putObject(request);
 
         } catch (AmazonServiceException e) {
-            // The call was transmitted successfully, but Amazon S3 couldn't process
-            // it, so it returned an error response.
+            log.warn("Exception, msg={}", e.getLocalizedMessage());
             e.printStackTrace();
         } catch (SdkClientException e) {
-            // Amazon S3 couldn't be contacted for a response, or the client
-            // couldn't parse the response from Amazon S3.
+            log.warn("Exception, msg={}", e.getLocalizedMessage());
             e.printStackTrace();
         } catch (Exception e) {
+            log.warn("Exception, msg={}", e.getLocalizedMessage());
             e.printStackTrace();
         }
 

@@ -6,9 +6,11 @@ import com.sushi.api.validators.Password;
 import com.sushi.api.validators.USPhoneNumber;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

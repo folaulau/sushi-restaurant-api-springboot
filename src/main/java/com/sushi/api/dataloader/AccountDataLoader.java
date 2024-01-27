@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import com.sushi.api.entity.account.Account;
 import com.sushi.api.entity.account.AccountDAO;
+import com.sushi.api.entity.role.Role;
+import com.sushi.api.entity.role.UserType;
 import com.sushi.api.entity.user.User;
 import com.sushi.api.entity.user.UserDAO;
 import com.sushi.api.entity.user.UserStatus;
@@ -48,13 +50,22 @@ public class AccountDataLoader implements ApplicationRunner {
 
             user.setLastName(lastName);
 
-            user.setEmail((firstName + lastName).toLowerCase() + "@gmail.com");
+            if(i==3) {
+                user.setEmail("folaudev+3@gmail.com");
+            }else {
+                user.setEmail((firstName + lastName).toLowerCase() + "@gmail.com");
+            }
+            
             
             user.setStatus(UserStatus.ACTIVE);
 
             user.setDob(LocalDate.now().minusYears(RandomGeneratorUtils.getIntegerWithin(10, 40)));
 
             user.setPhoneNumber("310" + RandomGeneratorUtils.getIntegerWithin(100, 999) + "" + RandomGeneratorUtils.getIntegerWithin(1000, 9999));
+            
+            user.addRole(Role.builder()
+                    .userType(UserType.user)
+                    .build());
             
             user.setPassword(PasswordUtils.hashPassword(PasswordUtils.DEV_PASSWORD));
             

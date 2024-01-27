@@ -78,7 +78,7 @@ public class LineItem implements Serializable {
   private String uuid;
 
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
-  @JoinColumn(name = "product_id", nullable = false)
+  @JoinColumn(name = "product_id", nullable = false, unique = false)
   private Product product;
 
   @JsonIgnore

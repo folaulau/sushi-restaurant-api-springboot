@@ -111,6 +111,8 @@ public class AuthenticationTests extends IntegrationTestConfiguration {
     void itShouldSignIn_valid() throws Exception {
         /**
          * Sign in
+         * 
+         * folaudev+3@gmail.com is a preloaded user.
          */
 
       UserSignInDTO userSignInDTO = UserSignInDTO.builder()

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.sushi.api.dto.AuthenticationResponseDTO;
 import com.sushi.api.dto.UserSignInDTO;
 import com.sushi.api.dto.UserSignUpDTO;
-import com.sushi.api.entity.user.User;
 import com.sushi.api.utils.ObjectUtils;
 import com.sushi.api.utils.PasswordUtils;
 import jakarta.annotation.Resource;
@@ -14,17 +13,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sushi.api.IntegrationTestConfiguration;
 import com.sushi.api.library.aws.secretsmanager.XApiKey;
-import com.sushi.api.utils.RandomGeneratorUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import com.github.javafaker.Faker;
@@ -35,11 +31,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
